@@ -1,217 +1,290 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 
 <head>
-
+    <!-- Metadata -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+
+    <!-- Fonts -->
+    <link rel="preload" href="assets/fonts/Inter/UcCo3FwrK3iLTcvmYwYL8g.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/Inter/UcCo3FwrK3iLTcviYwY.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/fonts.css">
+    <link rel="stylesheet" href="styles/main.css">
+
 </head>
 
-<body>
+<body class="home-page">
 
-    <!-- Header -->
-    <header>
-        <!-- Navbar -->
-        <nav>
-            <ul>
-                <li>
-                    <a href="index.html">Главная страница</a>
-                </li>
-                <li>
-                    <a href="blog.html" tabindex="1">Блог</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+    <div class="page-shell">
+        <!-- Header -->
+        <header class="index-header">
+            <!-- Navigation -->
+            <nav class="navbar">
+                <div class="navbar-logo">
+                    <a href="index.html">codeX-folio</a>
+                </div>
 
-    <!-- Main Content -->
-    <main>
+                <ul class="nav-links">
+                    <li><a href="#about" class="active-link">About me</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="#contacts">Contact</a></li>
+                </ul>
+            </nav>
 
-        <!-- About Section -->
-        <section>
-            <h1>Обо мне</h1>
+            <!-- Hero -->
+            <section class="hero" id="about">
+                <div class="hero-content">
+                    <h1>
+                        Hello! I’m Tarek,
+                        <br>
+                        a Full-stack Web3 developer
+                    </h1>
 
-            <p>
-                Меня зовут Тарек. Я Full-stack Web3 разработчик и студент программной инженерии
-                в Новосибирском государственном техническом университете.
-            </p>
-
-            <p>
-                Я развиваюсь в области веб-разработки, блокчейн-технологий и Web3-приложений.
-                Основное внимание уделяю созданию современных цифровых активов с помощью web3-приложений,
-                смарт-контрактов.
-            </p>
-
-            <p>
-                Также я работаю над собственными проектами и стартап-идеями,
-                связанными с токенизацией, образовательными платформами
-                и блокчейн-ориентированными веб-сервисами.
-            </p>
-
-            <!-- Hero image -->
-            <div>
-                <img src="assets/images/avatar.webp" alt="Фото avatar" width="200">
-            </div>
-        </section>
-
-        <!-- Career Section -->
-        <section>
-            <h2>Моя карьера</h2>
-
-            <!-- Current position -->
-            <section>
-                <h3>Текущая должность</h3>
-
-                <p>
-                    <strong>Разработка собственных Web3-платформ и развитие стартапа WebWave3.io</strong>
-                    (2024 — настоящее время)
-                </p>
-
-                <p>
-                    Развитие собственных решений в сфере блокчейн и Web3,
-                    проектирование сервисов, работа с архитектурой приложений
-                    и развитие продуктовых идей стартапа.
-                </p>
-            </section>
-
-            <!-- Work experience -->
-            <section>
-                <h3>Опыт работы</h3>
-
-                <article>
-                    <h4>Разработка собственных проектов в сфере blockchain и Web3</h4>
-
-                    <p>
-                        Развитие практических навыков и создание собственных продуктовых решений
-                        для блокчейн-ориентированных веб-приложений. В рамках этой деятельности
-                        велась работа над платформой для оплаты образовательных услуг через блокчейн
-                        с использованием смарт-контрактов, а также над сервисом формирования
-                        квалификационного профиля студента для хранения, представления
-                        и подтверждения достижений и компетенций в цифровом формате.
+                    <p class="hero-text">
+                        I build blockchain-based web applications, smart contracts,
+                        and digital products focused on education, tokenization
+                        and Web3 services.
                     </p>
 
-                    <p>2024 — настоящее время</p>
+                    <a class="hero-link" href="#skills">More about me -></a>
+                </div>
+
+                <!-- Hero image -->
+                <aside class="hero-media">
+                    <div class="hero-photo-mask">
+                        <img src="assets/images/avatar.webp" alt="Tarek avatar">
+                    </div>
+                </aside>
+            </section>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Blog Preview Section -->
+            <section class="featured-posts">
+                <article class="post-card">
+                    <div class="post-card-content">
+                        <p class="post-category">Student Profile floating over blockchain</p>
+                        <h2>NETI-Link</h2>
+                        <p>
+                            A secure blockchain service for presenting and verifying student achievements,helps students
+                            to find an job opportunities based on their activity and achievments!
+                        </p>
+                    </div>
+
+                    <div class="post-card-image">
+                        <img src="assets/images/link1.webp" alt="Paris secrets">
+                    </div>
                 </article>
+
+                <article class="post-card">
+                    <div class="post-card-content">
+                        <p class="post-category">Payment Tuition Fees</p>
+                        <h2>WebWave3 Cryptogate</h2>
+                        <p>
+                            A blockchain platform for education payments using smart contracts and digital
+                            transactions.
+                        </p>
+                    </div>
+
+                    <div class="post-card-image">
+                        <img src="assets/images/uni1.webp" alt="Oceanic feeling">
+                    </div>
+                </article>
+
+                <p class="posts-link">
+                    <a href="blog.html">Browse all posts</a>
+                </p>
             </section>
 
-            <!-- Education -->
-            <section>
-                <h3>Образование</h3>
+            <!-- Skills Section -->
+            <section id="skills" class="skills-section">
+                <h2>My skills</h2>
 
-                <article>
-                    <h4>Novosibirsk State Technical University</h4>
-
-                    <p>Бакалавр программной инженерии</p>
-
-                    <p>
-                        Выпускная работа:
-                        «Разработка защищенного блокчейн-ориентированного сервиса
-                        формирования квалификационного профиля студента»
-                    </p>
-
-                    <p>2021 — 2026</p>
-                </article>
-            </section>
-
-            <!-- Courses and Certificates -->
-            <section>
-                <h3>Курсы и сертификации:</h3>
-
-                <ul>
-                    <li>PHP — SoloLearn (2022)</li>
-                    <li>SQL — SoloLearn (2022)</li>
+                <ul class="skills-grid">
+                    <li>PHP</li>
+                    <li>SQL</li>
+                    <li>Solidity</li>
+                    <li>JavaScript</li>
+                    <li>React</li>
+                    <li>Next.js</li>
+                    <li>Ethers.js</li>
+                    <li>Tailwind CSS</li>
+                    <li>Laravel</li>
+                    <li>MySQL</li>
+                    <li>PostgreSQL</li>
+                    <li>Blockchain</li>
                 </ul>
             </section>
-        </section>
 
-        <!-- Skills Section -->
-        <section>
-            <h2>Навыки:</h2>
+            <!-- Work Section -->
+            <section class="work-section">
+                <div class="work-intro">
+                    <h2>My work</h2>
+                    <p class="projects-intro">
+                        Selected personal and startup blockchain projects
+                        focused on Web3 services, education solutions,
+                        and Tokenization Real-asset World.
+                    </p>
+                </div>
 
-            <ul>
-                <li>Программирование: PHP, SQL, Solidity, JavaScript, React, Next.js, Laravel, Tailwind CSS</li>
-                <li>Blockchain: Ethers.js, Alchemy RPC, Foundry, ERC-20 / TRC-20 Tokens, NFT</li>
-                <li>Базы данных: MySQL, PostgreSQL</li>
-            </ul>
-        </section>
+                <div class="work-timeline">
+                    <article class="timeline-item">
+                        <div class="timeline-icon">
+                            <img src="assets/images/icon-webwave3.webp" alt="WebWave3 icon">
+                        </div>
 
-        <!-- Achievements Section -->
-        <section>
-            <h2>Достижения:</h2>
+                        <div class="timeline-content">
+                            <p class="timeline-date">2025 - Present</p>
+                            <h3>WebWave3.io</h3>
+                            <p>
+                                A startup focused on blockchain-powered digital products
+                                and Web3 finetech services.
+                            </p>
+                        </div>
+                    </article>
 
-            <ul>
-                <li>Разработка собственных Web3-проектов и продуктовых решений в сфере blockchain.</li>
-                <li>Работа над платформой для оплаты образовательных услуг через блокчейн.</li>
-                <li>Разработка сервиса цифрового квалификационного профиля студента.</li>
-                <li>Разработка Web3-платформа для цифрового управления и продажи авиабилетов.</li>
-                <li>Развитие стартапа WebWave3.io и его цифровых продуктовых идей.</li>
-            </ul>
-        </section>
+                    <article class="timeline-item">
+                        <div class="timeline-icon">
+                            <img src="assets/images/icon-Neti-Cryptogate.webp" alt="Education payment icon">
+                        </div>
 
-        <!-- Latest Articles Section -->
-        <section>
-            <h2>Последние статьи</h2>
+                        <div class="timeline-content">
+                            <p class="timeline-date">2024 - Present</p>
+                            <h3>Education Payment Platform</h3>
+                            <p>
+                                A blockchain-based concept for education payments
+                                using smart contracts and digital transactions.
+                            </p>
+                        </div>
+                    </article>
 
-            <article>
-                <h3>Как работает блокчейн простыми словами</h3>
+                    <article class="timeline-item">
+                        <div class="timeline-icon">
+                            <img src="assets/images/icon-NetiLink.webp" alt="Qualification profile icon">
+                        </div>
 
-                <p>
-                    Краткое объяснение технологии блокчейн, принципов
-                    децентрализации и применения цифровых активов.
-                </p>
+                        <div class="timeline-content">
+                            <p class="timeline-date">2024 - Present</p>
+                            <h3>NETI-Link Student Qualification Profile Service</h3>
+                            <p>
+                                A secure blockchain-oriented service for presenting
+                                and verifying student achievements, helps students
+                                to find an job opportunities based on their activity and achievments!.
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </section>
 
-                <p>15 декабря 2024</p>
-            </article>
+            <!-- Hobby Projects Section -->
+            <section class="projects-section">
+                <h2>Hobby projects</h2>
 
-            <article>
-                <h3>Что такое Web3</h3>
+                <div class="Hobby-right-header">
+                    <p>
+                        Web3 devs transfering real-asset into digital world through power of Blockchain!
+                    </p>
 
-                <p>
-                    Обзор идеи Web3, смарт-контрактов и новых возможностей
-                    для современных веб-приложений.
-                </p>
+                </div>
+                <div class="projects-gallery">
+                    <div class="gallery-item gallery-item-1">
+                        <a href="https://nstu.ru/news/news_more?idnews=170745" target="_blank" class="gallery-link">
+                            <img src="assets/images/hobby-1.webp" alt="Creative portrait project">
 
-                <p>10 декабря 2024</p>
-            </article>
+                            <div class="gallery-overlay gallery-overlay-image">
+                                <p>AVTF student showed his developments at the World Youth Festival</p>
+                            </div>
+                        </a>
+                    </div>
 
-            <article>
-                <h3>Как создать ERC-20 токен</h3>
+                    <div class="gallery-item gallery-item-2">
+                        <img src="assets/images/blockchainIcon.webp" alt="Brand identity practice">
+                        <div class="gallery-overlay">
+                            <p>Blockchain Architecture</p>
+                        </div>
+                    </div>
 
-                <p>
-                    Краткий обзор создания токена на Solidity
-                    и базовых принципов работы токенов в блокчейн-среде.
-                </p>
+                    <div class="gallery-item gallery-item-3">
+                        <img src="assets/images/blockchainIcon2.webp" alt="Web layout experiment">
+                        <div class="gallery-overlay">
+                            <p>Smart Contracts As Middle man role</p>
+                        </div>
+                    </div>
 
-                <p>5 декабря 2024</p>
-            </article>
-
-            <p>
-                <a href="blog.html" target="_blank">Посмотреть все статьи</a>
-            </p>
-        </section>
-
-    </main>
+                    <div class="gallery-item gallery-item-4">
+                        <img src="assets/images/blockchainIcon3.webp" alt="Visual composition study">
+                        <div class="gallery-overlay">
+                            <p>Web3 Applications integeration with Blockchain</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <!-- Footer -->
-    <footer>
-        <section>
-            <h2>Контакты</h2>
+    <footer id="contacts" class="footer-contact">
+        <div class="footer-shell">
+            <section class="footer-left">
+                <h2>Say hello and let's work together !</h2>
 
-            <p>Email: tata4all200020@mail.ru</p>
-            <p>Телефон: +7 953 764 8687</p>
-        </section>
+                <div class="footer-contact-info">
+                    <p>Email: tata4all200020@mail.ru</p>
+                    <p>Phone: +7 (953) 764-86-87</p>
+                </div>
 
-        <section>
-            <h2>Социальные сети</h2>
+                <div class="footer-socials">
+                    <a href="https://vk.com/0c0dex" aria-label="VK" class="social-link">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M21.579 6.855c.14-.465 0-.806-.662-.806h-2.193c-.558 0-.813.295-.953.619 0 0-1.115 2.719-2.695 4.482-.51.513-.743.675-1.021.675-.139 0-.341-.162-.341-.627V6.855c0-.558-.161-.806-.626-.806H9.642c-.348 0-.558.258-.558.504 0 .528.79.65.871 2.138v3.228c0 .707-.127.836-.407.836-.743 0-2.551-2.729-3.624-5.853-.209-.607-.42-.852-.98-.852H2.752c-.627 0-.752.295-.752.619 0 .582.743 3.462 3.461 7.271 1.812 2.601 4.363 4.011 6.687 4.011 1.393 0 1.565-.313 1.565-.853v-1.966c0-.626.133-.752.574-.752.324 0 .882.164 2.183 1.417 1.486 1.486 1.732 2.153 2.567 2.153h2.192c.626 0 .939-.313.759-.931-.197-.615-.907-1.51-1.849-2.569-.512-.604-1.277-1.254-1.51-1.579-.325-.419-.231-.604 0-.976.001.001 2.672-3.761 2.95-5.04z" />
+                        </svg>
+                    </a>
 
-            <p>
-                <a href="#">Instagram</a> |
-                <a href="https://x.com/C0dex_wW3">Twitter</a> |
-                <a href="https://www.linkedin.com/in/tarekcx/">LinkedIn</a> |
-                <a href="https://github.com/codex32byte">GitHub</a>
-            </p>
-        </section>
+                    <a href="https://t.me/C0dex_wW3" aria-label="Telegram" class="social-link">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z" />
+                        </svg>
+                    </a>
+
+                    <a href="https://github.com/codex32byte" aria-label="GitHub" class="social-link">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" role="img"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                        </svg>
+                    </a>
+                </div>
+
+                <p class="footer-copy">© 2026 Brand, Inc</p>
+            </section>
+
+            <section class="footer-right">
+                <form action="#" method="post">
+                    <p>
+                        <label for="email">Email</label><br>
+                        <input type="email" id="email" name="email" placeholder="Your email address">
+                    </p>
+
+                    <p>
+                        <label for="message">Input your message</label><br>
+                        <textarea id="message" name="message" rows="5" placeholder="Input your message"></textarea>
+                    </p>
+
+                    <p>
+                        <button type="submit">Submit</button>
+                    </p>
+                </form>
+            </section>
+        </div>
     </footer>
 
 </body>
