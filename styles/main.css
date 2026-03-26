@@ -14,7 +14,6 @@
     --input-line: #6c7384;
 }
 
-
 *,
 *::before,
 *::after {
@@ -547,6 +546,10 @@ h4 {
     gap: 28px;
 }
 
+.blog-card {
+    position: relative;
+}
+
 .blog-card:first-child {
     grid-column: 1 / -1;
     display: grid;
@@ -616,6 +619,39 @@ h4 {
 .blog-card-content p:last-child {
     margin: 0;
     color: var(--text-muted);
+}
+
+.delete-post-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background-color: rgba(31, 36, 50, 0.78);
+    color: #ffffff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.22s ease, transform 0.22s ease, background-color 0.22s ease;
+    z-index: 2;
+}
+
+.blog-card:hover .delete-post-btn,
+.blog-card:focus-within .delete-post-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.delete-post-btn:hover,
+.delete-post-btn:focus {
+    background-color: #c94d4d;
 }
 
 /* Blog admin icons */

@@ -7,6 +7,10 @@ const closeArticleDialogBtn = document.getElementById("close-article-dialog");
 const cancelFormBtn = document.getElementById("cancel-form-btn");
 const blogForm = document.getElementById("blog-form");
 
+// form inputs
+const titleInput = document.getElementById("title");
+const contentInput = document.getElementById("content");
+
 // blog posts container and template
 const blogCardsContainer = document.getElementById("blog-cards");
 const blogCardTemplate = document.getElementById("blog-card-template");
@@ -45,17 +49,51 @@ function closeStatsDialog() {
     statsDialog.close();
 }
 
-// add a new mock post using template
-function addMockPost() {
+// create current date for new post
+function getCurrentPublishedDate() {
+    const now = new Date();
+    return now.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+    });
+}
+
+// add a new post using form data and template
+function addPostFromForm() {
     const templateContent = blogCardTemplate.content.cloneNode(true);
+
+    const postTitle = templateContent.querySelector(".template-post-title");
+    const postText = templateContent.querySelector(".template-post-text");
+    const postDate = templateContent.querySelector(".blog-card-date");
+
+    postTitle.textContent = titleInput.value.trim();
+    postText.textContent = contentInput.value.trim();
+    postDate.textContent = `Published: ${getCurrentPublishedDate()}`;
+
     blogCardsContainer.appendChild(templateContent);
     updatePostsCount();
 }
 
+// delete post when clicking delete button
+blogCardsContainer.addEventListener("click", function (event) {
+    const deleteBtn = event.target.closest(".delete-post-btn");
+
+    if (!deleteBtn) {
+        return;
+    }
+
+    const blogCard = deleteBtn.closest(".blog-card");
+
+    if (blogCard) {
+        blogCard.remove();
+        updatePostsCount();
+    }
+});
+
 // button actions
 createPostBtn.addEventListener("click", openArticleDialog);
 closeArticleDialogBtn.addEventListener("click", closeArticleDialog);
-cancelFormBtn.addEventListener("click", closeArticleDialog);
 
 showStatsBtn.addEventListener("click", openStatsDialog);
 closeStatsDialogBtn.addEventListener("click", closeStatsDialog);
@@ -63,7 +101,13 @@ closeStatsDialogBtn.addEventListener("click", closeStatsDialog);
 // add post on form submit
 blogForm.addEventListener("submit", function (event) {
     event.preventDefault();
-    addMockPost();
+    addPostFromForm();
+    blogForm.reset();
+    closeArticleDialog();
+});
+
+// reset and close form on cancel button
+cancelFormBtn.addEventListener("click", function () {
     blogForm.reset();
     closeArticleDialog();
 });
