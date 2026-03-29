@@ -8,6 +8,7 @@
     <title>Blog</title>
 
     <link rel="icon" href="assets/images/favicon.png" type="image/png">
+
     <!-- Fonts -->
     <link rel="preload" href="assets/fonts/Inter/UcCo3FwrK3iLTcvmYwYL8g.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/Inter/UcCo3FwrK3iLTcviYwY.woff2" as="font" type="font/woff2" crossorigin>
@@ -15,6 +16,8 @@
     <!-- Styles -->
     <link rel="stylesheet" href="styles/fonts.css">
     <link rel="stylesheet" href="styles/main.css">
+
+    <script src="scripts/blog.js" defer></script>
 </head>
 
 <body class="blog-page">
@@ -22,7 +25,6 @@
     <div class="page-shell">
         <!-- Header -->
         <header class="blog-header">
-            <!-- Navigation -->
             <nav class="navbar">
                 <div class="navbar-logo">
                     <a href="index.html">codeX-folio</a>
@@ -36,135 +38,245 @@
             </nav>
         </header>
 
-        <!-- Main Content -->
-        <main>
-            <!-- Articles -->
-            <section class="blog-section">
-                <h1 class="blog-title">My blogs</h1>
-                <p class="blog-intro">
-                    An overview Articles of NFT concepts, digital ownership,
-                    and NFT use cases in user and business-oriented services.
+        <!-- Blog page layout -->
+        <div class="blog-page-layout">
+
+            <!-- Admin panel -->
+            <aside class="admin-panel-icons">
+                <button type="button" class="admin-icon-btn" id="create-post-btn" title="Create article"
+                    aria-label="Create article">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M5 21C4.45 21 3.979 20.8043 3.587 20.413C3.19567 20.021 3 19.55 3 19V5C3 4.45 3.19567 3.979 3.587 3.587C3.979 3.19567 4.45 3 5 3H14V5H5V19H19V10H21V19C21 19.55 20.8043 20.021 20.413 20.413C20.021 20.8043 19.55 21 19 21H5ZM8 17V15H16V17H8ZM8 14V12H16V14H8ZM8 11V9H16V11H8ZM17 9V7H15V5H17V3H19V5H21V7H19V9H17Z"
+                            fill="#61C15C" />
+                    </svg>
+
+                </button>
+
+                <button type="button" class="admin-icon-btn" id="show-stats-btn" title="Show statistics"
+                    aria-label="Show statistics">
+
+                    <svg width="22" height="21" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18.88 16.47C19.32 15.77 19.58 14.96 19.58 14.08C19.58 11.59 17.57 9.58 15.08 9.58C12.59 9.58 10.58 11.59 10.58 14.08C10.58 16.57 12.59 18.58 15.07 18.58C15.95 18.58 16.77 18.32 17.46 17.88L20.58 21L22 19.58L18.88 16.47ZM15.08 16.58C13.7 16.58 12.58 15.46 12.58 14.08C12.58 12.7 13.7 11.58 15.08 11.58C16.46 11.58 17.58 12.7 17.58 14.08C17.58 15.46 16.46 16.58 15.08 16.58ZM14.72 8.08C13.98 8.1 13.27 8.26 12.62 8.53L12.07 7.7L8.27 13.88L5.26 10.36L1.63 16.17L0 15L5 7L8 10.5L12 4L14.72 8.08ZM17.31 8.58C16.67 8.3 15.98 8.13 15.26 8.09L20.38 0L22 1.18L17.31 8.58Z"
+                            fill="#61C15C" />
+                    </svg>
+
+                </button>
+            </aside>
+
+            <!-- Main content -->
+            <main class="blog-main-content">
+
+                <!-- Articles -->
+                <section class="blog-section">
+                    <h1 class="blog-title">My blogs</h1>
+
+                    <p class="blog-intro">
+                        An overview Articles of NFT concepts, digital ownership,
+                        and NFT use cases in user and business-oriented services.
+                    </p>
+
+                    <div class="blog-cards" id="blog-cards">
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="assets/images/link1.webp" alt="How blockchain works">
+                            </div>
+
+                            <div class="blog-card-content">
+                                <p class="blog-card-date">Published: December 15, 2025</p>
+                                <h2>NETI-Link How it works in simple words!</h2>
+                                <p>
+                                    This article explains the main ideas behind NETI-Link Platform,
+                                    structure, decentralization, and how it helps students to find job!
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="assets/images/uni1.webp" alt="What is Web3">
+                            </div>
+
+                            <div class="blog-card-content">
+                                <p class="blog-card-date">Published: December 10, 2025</p>
+                                <h2>What is WebWave3 cryptogate and how it changes the internet</h2>
+                                <p>
+                                    A short overview of platform, smart contracts,
+                                    and new opportunities for digital product development.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="assets/images/article2.webp" alt="How to create ERC-20 token">
+                            </div>
+
+                            <div class="blog-card-content">
+                                <p class="blog-card-date">Published: December 5, 2025</p>
+                                <h2>How to create an ERC-20 token</h2>
+                                <p>
+                                    The basics of token creation in Solidity,
+                                    working with contracts, and the main steps
+                                    of token development in Ethereum.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="assets/images/article3.webp" alt="Blockchain in education">
+                            </div>
+
+                            <div class="blog-card-content">
+                                <p class="blog-card-date">Published: November 28, 2025</p>
+                                <h2>Blockchain in educational platforms</h2>
+                                <p>
+                                    A practical example of blockchain technology
+                                    used for education payments, data storage,
+                                    and student achievement verification.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="assets/images/article4.webp" alt="NFT and digital products">
+                            </div>
+
+                            <div class="blog-card-content">
+                                <p class="blog-card-date">Published: November 20, 2025</p>
+                                <h2>NFT and digital products</h2>
+                                <p>
+                                    An overview of NFT concepts, digital ownership,
+                                    and NFT use cases in user and business-oriented services.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="assets/images/article5.webp" alt="NFT and digital products">
+                            </div>
+
+                            <div class="blog-card-content">
+                                <p class="blog-card-date">Published: November 20, 2025</p>
+                                <h2>NFT and digital products</h2>
+                                <p>
+                                    An overview of NFT concepts, digital ownership,
+                                    and NFT use cases in user and business-oriented services.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="assets/images/article6.webp" alt="NFT and digital products">
+                            </div>
+
+                            <div class="blog-card-content">
+                                <p class="blog-card-date">Published: November 20, 2025</p>
+                                <h2>NFT and digital products</h2>
+                                <p>
+                                    An overview of NFT concepts, digital ownership,
+                                    and NFT use cases in user and business-oriented services.
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <p class="posts-link">
+                        <a href="#">Next -&gt;</a>
+                    </p>
+                </section>
+            </main>
+        </div>
+    </div>
+
+
+
+
+    <!-- Create article dialog -->
+    <dialog class="article-dialog" id="article-dialog">
+        <div class="article-dialog-body">
+            <button type="button" class="article-dialog-close" id="close-article-dialog"
+                aria-label="Close article form">
+                ×
+            </button>
+
+            <section class="blog-form-section">
+                <h2>Добавить статью</h2>
+
+                <form action="#" method="post" class="blog-form" id="blog-form">
+                    <label>Заголовок</label>
+                    <p>
+                        <input type="text" id="title" name="title" placeholder="Заголовок статьи" required>
+                    </p>
+
+                    <label>Текст статьи</label>
+                    <p>
+                        <textarea id="content" name="content" rows="8" placeholder="Текст статьи" required></textarea>
+                    </p>
+
+                    <p class="blog-form-actions">
+                        <button type="submit">Добавить</button>
+                        <button type="button" class="blog-form-cancel-btn" id="cancel-form-btn">Отмена</button>
+                    </p>
+                </form>
+            </section>
+        </div>
+    </dialog>
+
+
+
+
+
+    <!-- Template -->
+    <template id="blog-card-template">
+        <article class="blog-card">
+            <div class="blog-card-image">
+                <img src="assets/images/article6.webp" alt="New article image">
+            </div>
+
+            <div class="blog-card-content">
+                <p class="blog-card-date">Published: March 20, 2026</p>
+                <h2>Added through Template code</h2>
+                <p>
+                    This is a mock article description added with JavaScript template.
+                    A short overview of platform, smart contracts, and new opportunities for digital product
+                    development.
                 </p>
-                <div class="blog-cards">
-                    <article class="blog-card">
-                        <div class="blog-card-image">
-                            <img src="assets/images/link1.webp" alt="How blockchain works">
-                        </div>
-
-                        <div class="blog-card-content">
-                            <p class="blog-card-date">Published: December 15, 2025</p>
-                            <h2>NETI-Link How it works in simple words!</h2>
-                            <p>
-                                This article explains the main ideas behind NETI-Link Platform,
-                                structure, decentralization, and how it helps students to find job!
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="blog-card">
-                        <div class="blog-card-image">
-                            <img src="assets/images/uni1.webp" alt="What is Web3">
-                        </div>
-
-                        <div class="blog-card-content">
-                            <p class="blog-card-date">Published: December 10, 2025</p>
-                            <h2>What is WebWave3 cryptogate and how it changes the internet</h2>
-                            <p>
-                                A short overview of platform, smart contracts,
-                                and new opportunities for digital product development.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="blog-card">
-                        <div class="blog-card-image">
-                            <img src="assets/images/article2.webp" alt="How to create ERC-20 token">
-                        </div>
-
-                        <div class="blog-card-content">
-                            <p class="blog-card-date">Published: December 5, 2025</p>
-                            <h2>How to create an ERC-20 token</h2>
-                            <p>
-                                The basics of token creation in Solidity,
-                                working with contracts, and the main steps
-                                of token development in Ethereum.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="blog-card">
-                        <div class="blog-card-image">
-                            <img src="assets/images/article3.webp" alt="Blockchain in education">
-                        </div>
-
-                        <div class="blog-card-content">
-                            <p class="blog-card-date">Published: November 28, 2025</p>
-                            <h2>Blockchain in educational platforms</h2>
-                            <p>
-                                A practical example of blockchain technology
-                                used for education payments, data storage,
-                                and student achievement verification.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="blog-card">
-                        <div class="blog-card-image">
-                            <img src="assets/images/article4.webp" alt="NFT and digital products">
-                        </div>
-
-                        <div class="blog-card-content">
-                            <p class="blog-card-date">Published: November 20, 2025</p>
-                            <h2>NFT and digital products</h2>
-                            <p>
-                                An overview of NFT concepts, digital ownership,
-                                and NFT use cases in user and business-oriented services.
-                            </p>
-                        </div>
-                    </article>
+            </div>
+        </article>
+    </template>
 
 
-                    <article class="blog-card">
-                        <div class="blog-card-image">
-                            <img src="assets/images/article5.webp" alt="NFT and digital products">
-                        </div>
-
-                        <div class="blog-card-content">
-                            <p class="blog-card-date">Published: November 20, 2025</p>
-                            <h2>NFT and digital products</h2>
-                            <p>
-                                An overview of NFT concepts, digital ownership,
-                                and NFT use cases in user and business-oriented services.
-                            </p>
-                        </div>
-                    </article>
 
 
-                    <article class="blog-card">
-                        <div class="blog-card-image">
-                            <img src="assets/images/article6.webp" alt="NFT and digital products">
-                        </div>
+    <!-- Statistics dialog -->
+    <dialog class="stats-dialog" id="stats-dialog">
+        <div class="stats-dialog-body">
+            <button type="button" class="stats-dialog-close" id="close-stats-dialog" aria-label="Close dialog">
+                ×
+            </button>
 
-                        <div class="blog-card-content">
-                            <p class="blog-card-date">Published: November 20, 2025</p>
-                            <h2>NFT and digital products</h2>
-                            <p>
-                                An overview of NFT concepts, digital ownership,
-                                and NFT use cases in user and business-oriented services.
-                            </p>
-                        </div>
-                    </article>
+            <h2 class="stats-dialog-title">Статистика страницы</h2>
 
+            <div class="stats-cards">
+                <div class="stats-card">
+                    <p class="stats-card-label">Всего статей:</p>
+                    <p class="stats-card-value" id="posts-count">0</p>
                 </div>
 
-                <p class="posts-link">
-                    <a href="#">Next -></a>
-                </p>
-            </section>
-
-
-        </main>
-    </div>
+                <div class="stats-card">
+                    <p class="stats-card-label">Комментарии:</p>
+                    <p class="stats-card-value">0</p>
+                </div>
+            </div>
+        </div>
+    </dialog>
 
     <!-- Footer -->
     <footer id="contacts" class="footer-contact">
