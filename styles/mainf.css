@@ -292,6 +292,22 @@ h4 {
     border-color: var(--accent-green);
 }
 
+
+.empty-posts-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 220px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.empty-posts-message[hidden],
+.posts-link[hidden] {
+    display: none;
+}
+
 /* Skills */
 .skills-section {
     margin-bottom: 76px;
