@@ -1,4 +1,4 @@
-// buttons posts,dialogs
+// buttons posts, dialogs
 const createPostBtn = document.getElementById("create-post-btn");
 const showStatsBtn = document.getElementById("show-stats-btn");
 
@@ -14,23 +14,31 @@ const contentInput = document.getElementById("content");
 // blog posts container and template
 const blogCardsContainer = document.getElementById("blog-cards");
 const blogCardTemplate = document.getElementById("blog-card-template");
+const emptyPostsMessage = document.getElementById("empty-posts-message");
+const blogLoader = document.getElementById("blog-loader");
+
+// pagination elements
+const pagination = document.getElementById("pagination");
+const prevPageBtn = document.getElementById("prev-page-btn");
+const nextPageBtn = document.getElementById("next-page-btn");
 
 // statistics dialog elements
 const statsDialog = document.getElementById("stats-dialog");
 const closeStatsDialogBtn = document.getElementById("close-stats-dialog");
 const postsCountElement = document.getElementById("posts-count");
 
-// Count current blog posts
-function getPostsCount() {
-    return blogCardsContainer.querySelectorAll(".blog-card").length;
-}
+const yearElement = document.getElementById("footer-year").textContent = new Date().getFullYear();
 
-// Update posts count in statistics dialog
-function updatePostsCount() {
-    postsCountElement.textContent = getPostsCount();
-}
+const POSTS_STORAGE_KEY = "posts";
+const POSTS_PER_PAGE = 6;
+const INITIAL_LOAD_DELAY = 1700;
 
-// Open and close article dialog
+
+let posts = [];
+let currentPage = 1;
+let isLoading = false;
+
+// open and close article dialog
 function openArticleDialog() {
     articleDialog.showModal();
 }
@@ -52,6 +60,7 @@ function closeStatsDialog() {
 // create current date for new post
 function getCurrentPublishedDate() {
     const now = new Date();
+
     return now.toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
@@ -59,24 +68,166 @@ function getCurrentPublishedDate() {
     });
 }
 
-// add a new post using form data and template
-function addPostFromForm() {
+// delayer func
+function wait(ms) {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, ms);
+    });
+}
+
+// load posts from localStorage into state
+function loadPosts() {
+    posts = JSON.parse(localStorage.getItem(POSTS_STORAGE_KEY)) || [];
+}
+
+// save current posts state to localStorage
+function savePosts() {
+    localStorage.setItem(POSTS_STORAGE_KEY, JSON.stringify(posts));
+}
+
+// total pages
+function getTotalPages() {
+    return Math.ceil(posts.length / POSTS_PER_PAGE) || 1;
+}
+
+// current page posts only
+function getCurrentPagePosts() {
+    const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+    const endIndex = startIndex + POSTS_PER_PAGE;
+
+    return posts.slice(startIndex, endIndex);
+}
+
+// update posts count in statistics dialog
+function updatePostsCount() {
+    postsCountElement.textContent = posts.length;
+}
+
+// handling empty state and pagination visibility
+function updateBlogPageState() {
+    if (posts.length === 0) {
+        emptyPostsMessage.hidden = false;
+        pagination.hidden = true;
+    } else {
+        emptyPostsMessage.hidden = true;
+
+        if (posts.length > POSTS_PER_PAGE) {
+            pagination.hidden = false;
+        } else {
+            pagination.hidden = true;
+        }
+    }
+}
+
+// update prev / next buttons
+function updatePaginationControls() {
+    const totalPages = getTotalPages();
+
+    prevPageBtn.disabled = isLoading || currentPage === 1;
+    nextPageBtn.disabled = isLoading || currentPage === totalPages;
+}
+
+// create one post card from post object
+function createPostCard(post) {
     const templateContent = blogCardTemplate.content.cloneNode(true);
 
     const postTitle = templateContent.querySelector(".template-post-title");
     const postText = templateContent.querySelector(".template-post-text");
     const postDate = templateContent.querySelector(".blog-card-date");
 
-    postTitle.textContent = titleInput.value.trim();
-    postText.textContent = contentInput.value.trim();
-    postDate.textContent = `Published: ${getCurrentPublishedDate()}`;
+    postTitle.textContent = post.title;
+    postText.textContent = post.content;
+    postDate.textContent = `Published: ${post.date}`;
 
-    blogCardsContainer.appendChild(templateContent);
+    return templateContent;
+}
+
+// render posts for current page,,, UI
+function renderPosts() {
+    const currentPosts = getCurrentPagePosts();
+
+    blogCardsContainer.innerHTML = "";
+
+    currentPosts.forEach(function (post) {
+        const postCard = createPostCard(post);
+        blogCardsContainer.appendChild(postCard);
+    });
+}
+
+// loader visibility
+function showLoader() {
+    blogLoader.hidden = false;
+    blogCardsContainer.hidden = true;
+    emptyPostsMessage.hidden = true;
+    pagination.hidden = true;
+}
+
+function hideLoader() {
+    blogLoader.hidden = true;
+    blogCardsContainer.hidden = false;
+}
+
+// disable / enable controls
+function setLoadingState(loading) {
+    isLoading = loading;
+    createPostBtn.disabled = loading;
+    showStatsBtn.disabled = loading;
+    updatePaginationControls();
+}
+
+// main render handler
+function render() {
+    const totalPages = getTotalPages();
+
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+
+    renderPosts();
     updatePostsCount();
+    updateBlogPageState();
+    updatePaginationControls();
+}
+
+// init load articles  
+async function renderInitialPosts() {
+    setLoadingState(true);
+    showLoader();
+
+    try {
+        await wait(INITIAL_LOAD_DELAY);
+        loadPosts();
+        render();
+    } finally {
+        hideLoader();
+        setLoadingState(false);
+    }
+}
+
+// add a new post using form data
+async function addPostFromForm(post) {
+    setLoadingState(true);
+    showLoader();
+
+    try {
+        await wait(INITIAL_LOAD_DELAY);
+
+        posts.push(post);
+        savePosts();
+        currentPage = getTotalPages();
+        render();
+    } finally {
+        hideLoader();
+        setLoadingState(false);
+    }
 }
 
 // delete post when clicking delete button
 blogCardsContainer.addEventListener("click", function (event) {
+    if (isLoading) {
+        return;
+    }
+
     const deleteBtn = event.target.closest(".delete-post-btn");
 
     if (!deleteBtn) {
@@ -85,45 +236,126 @@ blogCardsContainer.addEventListener("click", function (event) {
 
     const blogCard = deleteBtn.closest(".blog-card");
 
-    if (blogCard) {
-        blogCard.remove();
-        updatePostsCount();
+    if (!blogCard) {
+        return;
+    }
+
+    const allCards = [...blogCardsContainer.querySelectorAll(".blog-card")];
+    const cardIndexOnPage = allCards.indexOf(blogCard);
+    const realIndex = (currentPage - 1) * POSTS_PER_PAGE + cardIndexOnPage;
+
+    posts.splice(realIndex, 1);
+    savePosts();
+
+    render();
+});
+
+// pagination events
+prevPageBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
+    if (currentPage > 1) {
+        currentPage--;
+        render();
+    }
+});
+
+nextPageBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
+    if (currentPage < getTotalPages()) {
+        currentPage++;
+        render();
     }
 });
 
 // button actions
-createPostBtn.addEventListener("click", openArticleDialog);
-closeArticleDialogBtn.addEventListener("click", closeArticleDialog);
+createPostBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
 
-showStatsBtn.addEventListener("click", openStatsDialog);
-closeStatsDialogBtn.addEventListener("click", closeStatsDialog);
+    openArticleDialog();
+});
 
-// add post on form submit
-blogForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    addPostFromForm();
-    blogForm.reset();
+closeArticleDialogBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
     closeArticleDialog();
 });
 
+showStatsBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
+    openStatsDialog();
+});
+
+closeStatsDialogBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
+    closeStatsDialog();
+});
+
+// add post on form submit
+blogForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (isLoading) {
+        return;
+    }
+
+    const post = {
+        title: titleInput.value.trim(),
+        content: contentInput.value.trim(),
+        date: getCurrentPublishedDate()
+    };
+
+    closeArticleDialog();
+    await addPostFromForm(post);
+    blogForm.reset();
+});
+
+
 // reset and close form on cancel button
 cancelFormBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
     blogForm.reset();
     closeArticleDialog();
 });
 
 // close dialogs when clicking outside the dialog content
 articleDialog.addEventListener("click", function (event) {
+    if (isLoading) {
+        return;
+    }
+
     if (event.target === articleDialog) {
         closeArticleDialog();
     }
 });
 
 statsDialog.addEventListener("click", function (event) {
+    if (isLoading) {
+        return;
+    }
+
     if (event.target === statsDialog) {
         closeStatsDialog();
     }
 });
 
-// Set initial posts count
-updatePostsCount();
+// initial load and render
+renderInitialPosts();

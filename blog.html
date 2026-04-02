@@ -15,7 +15,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="styles/fonts.css">
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/blog.css">
 
     <script src="scripts/blog.js" defer></script>
 </head>
@@ -76,132 +76,25 @@
                         and NFT use cases in user and business-oriented services.
                     </p>
 
-                    <div class="blog-cards" id="blog-cards">
-                        <article class="blog-card">
-                            <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
 
-                            <div class="blog-card-image">
-                                <img src="assets/images/link1.webp" alt="How blockchain works">
-                            </div>
-
-                            <div class="blog-card-content">
-                                <p class="blog-card-date">Published: December 15, 2025</p>
-                                <h2>NETI-Link How it works in simple words!</h2>
-                                <p>
-                                    This article explains the main ideas behind NETI-Link Platform,
-                                    structure, decentralization, and how it helps students to find job!
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="blog-card">
-                            <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
-
-                            <div class="blog-card-image">
-                                <img src="assets/images/uni1.webp" alt="What is Web3">
-                            </div>
-
-                            <div class="blog-card-content">
-                                <p class="blog-card-date">Published: December 10, 2025</p>
-                                <h2>What is WebWave3 cryptogate and how it changes the internet</h2>
-                                <p>
-                                    A short overview of platform, smart contracts,
-                                    and new opportunities for digital product development.
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="blog-card">
-                            <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
-
-                            <div class="blog-card-image">
-                                <img src="assets/images/article2.webp" alt="How to create ERC-20 token">
-                            </div>
-
-                            <div class="blog-card-content">
-                                <p class="blog-card-date">Published: December 5, 2025</p>
-                                <h2>How to create an ERC-20 token</h2>
-                                <p>
-                                    The basics of token creation in Solidity,
-                                    working with contracts, and the main steps
-                                    of token development in Ethereum.
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="blog-card">
-                            <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
-
-                            <div class="blog-card-image">
-                                <img src="assets/images/article3.webp" alt="Blockchain in education">
-                            </div>
-
-                            <div class="blog-card-content">
-                                <p class="blog-card-date">Published: November 28, 2025</p>
-                                <h2>Blockchain in educational platforms</h2>
-                                <p>
-                                    A practical example of blockchain technology
-                                    used for education payments, data storage,
-                                    and student achievement verification.
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="blog-card">
-                            <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
-
-                            <div class="blog-card-image">
-                                <img src="assets/images/article4.webp" alt="NFT and digital products">
-                            </div>
-
-                            <div class="blog-card-content">
-                                <p class="blog-card-date">Published: November 20, 2025</p>
-                                <h2>NFT and digital products</h2>
-                                <p>
-                                    An overview of NFT concepts, digital ownership,
-                                    and NFT use cases in user and business-oriented services.
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="blog-card">
-                            <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
-
-                            <div class="blog-card-image">
-                                <img src="assets/images/article5.webp" alt="NFT and digital products">
-                            </div>
-
-                            <div class="blog-card-content">
-                                <p class="blog-card-date">Published: November 20, 2025</p>
-                                <h2>NFT and digital products</h2>
-                                <p>
-                                    An overview of NFT concepts, digital ownership,
-                                    and NFT use cases in user and business-oriented services.
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="blog-card">
-                            <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
-
-                            <div class="blog-card-image">
-                                <img src="assets/images/article6.webp" alt="NFT and digital products">
-                            </div>
-
-                            <div class="blog-card-content">
-                                <p class="blog-card-date">Published: November 20, 2025</p>
-                                <h2>NFT and digital products</h2>
-                                <p>
-                                    An overview of NFT concepts, digital ownership,
-                                    and NFT use cases in user and business-oriented services.
-                                </p>
-                            </div>
-                        </article>
+                    <div class="blog-loader" id="blog-loader" hidden>
+                        <div class="blog-loader-dots" aria-label="Loading posts">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
 
-                    <p class="posts-link">
-                        <a href="#">Next -&gt;</a>
-                    </p>
+                    <div class="blog-cards" id="blog-cards"></div>
+
+                    <div class="empty-posts-message" id="empty-posts-message" hidden>
+                        <p>Нет статей</p>
+                    </div>
+
+                    <div class="pagination" id="pagination" hidden>
+                        <button type="button" class="pagination-btn" id="prev-page-btn">Prev</button>
+                        <button type="button" class="pagination-btn" id="next-page-btn">Next &rarr;</button>
+                    </div>
                 </section>
             </main>
         </div>
@@ -244,7 +137,7 @@
             <button type="button" class="delete-post-btn" aria-label="Удалить статью">×</button>
 
             <div class="blog-card-image">
-                <img src="assets/images/article6.webp" alt="New article image">
+                <img src="assets/images/link1.webp" alt="New article image">
             </div>
 
             <div class="blog-card-content">
@@ -287,8 +180,8 @@
                 <h2>Say hello and let's work together !</h2>
 
                 <div class="footer-contact-info">
-                    <p>Email: tata4all200020@mail.ru</p>
-                    <p>Phone: +7 953 764 8687</p>
+                    <a href="mailto:tata4all200020@mail.ru">Email: tata4all200020@mail.ru</a>
+                    <a href="tel:+79537648687">Phone: +7 953 764 8687</a>
                 </div>
 
                 <div class="footer-socials">
@@ -315,7 +208,7 @@
                     </a>
                 </div>
 
-                <p class="footer-copy">© 2026 Brand, Inc</p>
+                <p class="footer-copy">© <span id="footer-year"></span> Brand, Inc</p>
             </section>
 
             <section class="footer-right">
