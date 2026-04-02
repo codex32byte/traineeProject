@@ -1,0 +1,112 @@
+.footer-contact {
+    background-color: var(--footer-bg);
+    color: #ffffff;
+    margin-top: 40px;
+}
+
+.footer-shell {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 34px 36px 28px;
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 54px;
+    align-items: start;
+}
+
+.footer-left h2 {
+    color: #ffffff;
+    font-size: 52px;
+    line-height: 1.1;
+    margin: 0 0 18px;
+    max-width: 430px;
+}
+.footer-contact-info {
+    margin-bottom: 18px;
+}
+
+.footer-contact-info a {
+    display: block;
+    text-decoration: underline;
+}
+
+.footer-socials {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 34px;
+}
+
+.footer-socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    color: var(--footer-text);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.footer-socials a svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+    display: block;
+}
+
+.footer-socials a:hover,
+.footer-socials a:focus {
+    color: var(--accent-green);
+    transform: translateY(-2px);
+}
+
+.footer-copy {
+    margin: 0;
+    color: var(--footer-muted);
+    font-size: 12px;
+}
+
+.footer-right form p {
+    margin: 0 0 16px;
+}
+
+.footer-right label {
+    display: inline-block;
+    margin-bottom: 6px;
+    color: #dce1eb;
+    font-size: 14px;
+}
+
+.footer-right input,
+.footer-right textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--input-line);
+    background-color: transparent;
+    color: #ffffff;
+    outline: none;
+}
+
+.footer-right input::placeholder,
+.footer-right textarea::placeholder {
+    color: #9ea6b4;
+}
+
+.footer-right textarea {
+    resize: vertical;
+    min-height: 108px;
+}
+
+.footer-right button {
+    background-color: #63c45a;
+    color: #ffffff;
+    border: none;
+    padding: 10px 26px;
+    cursor: pointer;
+    min-width: 110px;
+    transition: opacity 0.3s ease;
+}
+
+.footer-right button:hover,
+.footer-right button:focus {
+    opacity: 0.92;
+}

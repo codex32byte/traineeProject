@@ -1,0 +1,48 @@
+.index-header,
+.blog-header {
+    padding-top: 20px;
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 56px;
+    padding: 16px 0;
+    background-color: rgba(245, 245, 242, 0.94);
+    backdrop-filter: blur(10px);
+}
+
+.navbar-logo a {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--nav-muted);
+    transition: color 0.3s ease, font-weight 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a:focus {
+    color: var(--accent-green);
+}
+
+.nav-links a.active-link {
+    font-weight: 700;
+    color: var(--accent-green);
+}

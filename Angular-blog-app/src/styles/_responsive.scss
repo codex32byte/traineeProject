@@ -1,0 +1,245 @@
+@media (max-width: 1024px) {
+    .page-shell {
+        padding: 0 28px;
+    }
+
+    .blog-page .page-shell {
+        padding-right: 28px;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        gap: 40px;
+    }
+
+    .hero-content {
+        max-width: 100%;
+    }
+
+    .hero-photo-mask {
+        width: 320px;
+        height: 440px;
+    }
+
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .work-section {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .Hobby-right-header {
+        float: none;
+        width: 100%;
+        margin: 0 0 24px;
+        max-width: 520px;
+    }
+
+    .projects-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+    }
+
+    .gallery-item-1,
+    .gallery-item-2,
+    .gallery-item-3,
+    .gallery-item-4 {
+        grid-column: auto;
+        grid-row: auto;
+        height: 260px;
+    }
+
+    .blog-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .blog-card:first-child {
+        grid-column: auto;
+        grid-template-columns: 1fr;
+    }
+
+    .blog-card:first-child .blog-card-image {
+        min-height: 260px;
+    }
+
+    .blog-card:first-child h2 {
+        font-size: 36px;
+    }
+
+    .admin-panel-icons {
+        position: static;
+        transform: none;
+        width: 100%;
+        min-height: auto;
+        border-radius: 28px;
+        flex-direction: row;
+        justify-content: center;
+        gap: 28px;
+        padding: 20px;
+        margin-bottom: 28px;
+    }
+
+    .footer-shell {
+        grid-template-columns: 1fr;
+        padding: 34px 28px 28px;
+        gap: 36px;
+    }
+
+    .footer-left h2 {
+        font-size: 42px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-shell {
+        padding: 0 20px;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+    }
+
+    .nav-links {
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+    .hero h1 {
+        font-size: 40px;
+    }
+
+    .hero-text {
+        font-size: 17px;
+        line-height: 1.6;
+    }
+
+    .post-card {
+        grid-template-columns: 1fr;
+    }
+
+    .post-card-image {
+        min-height: 220px;
+    }
+
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .projects-gallery {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .gallery-item-1,
+    .gallery-item-2,
+    .gallery-item-3,
+    .gallery-item-4 {
+        grid-column: auto;
+        grid-row: auto;
+        height: 240px;
+    }
+
+    .blog-title {
+        font-size: 42px;
+    }
+
+    .blog-intro {
+        max-width: 100%;
+        margin-bottom: 32px;
+    }
+
+    .blog-card:first-child h2 {
+        font-size: 32px;
+    }
+
+    .footer-shell {
+        padding: 30px 20px 24px;
+    }
+
+    .footer-left h2 {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-shell {
+        padding: 0 16px;
+    }
+
+    .navbar-logo a {
+        font-size: 24px;
+    }
+
+    .hero h1 {
+        font-size: 32px;
+        line-height: 1.15;
+    }
+
+    .hero-text {
+        font-size: 16px;
+    }
+
+    h2 {
+        font-size: 32px;
+    }
+
+    .hero-photo-mask {
+        width: 100%;
+        max-width: 300px;
+        height: 380px;
+    }
+
+    .post-card-content,
+    .blog-card:not(:first-child) .blog-card-content,
+    .blog-card:first-child .blog-card-content {
+        padding: 20px;
+    }
+
+    .blog-title {
+        font-size: 36px;
+    }
+
+    .blog-card:first-child h2 {
+        font-size: 28px;
+    }
+
+    .admin-icon-btn {
+        width: 48px;
+        height: 48px;
+    }
+
+    .admin-icon-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .stats-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .article-dialog-body {
+        padding: 26px 18px 20px;
+    }
+
+    .blog-form-actions {
+        flex-direction: column;
+    }
+
+    .blog-form button {
+        width: 100%;
+    }
+
+    .footer-left h2 {
+        font-size: 28px;
+    }
+
+    .footer-right button {
+        width: 100%;
+    }
+}
