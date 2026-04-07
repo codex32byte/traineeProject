@@ -15,6 +15,7 @@ const contentInput = document.getElementById("content");
 const blogCardsContainer = document.getElementById("blog-cards");
 const blogCardTemplate = document.getElementById("blog-card-template");
 const emptyPostsMessage = document.getElementById("empty-posts-message");
+const blogLoader = document.getElementById("blog-loader");
 
 // pagination elements
 const pagination = document.getElementById("pagination");
@@ -30,11 +31,12 @@ const yearElement = document.getElementById("footer-year").textContent = new Dat
 
 const POSTS_STORAGE_KEY = "posts";
 const POSTS_PER_PAGE = 6;
+const INITIAL_LOAD_DELAY = 1700;
+
 
 let posts = [];
 let currentPage = 1;
-
-
+let isLoading = false;
 
 // open and close article dialog
 function openArticleDialog() {
@@ -63,6 +65,13 @@ function getCurrentPublishedDate() {
         month: "long",
         day: "numeric",
         year: "numeric"
+    });
+}
+
+// delayer func
+function wait(ms) {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, ms);
     });
 }
 
@@ -114,8 +123,8 @@ function updateBlogPageState() {
 function updatePaginationControls() {
     const totalPages = getTotalPages();
 
-    prevPageBtn.disabled = currentPage === 1;
-    nextPageBtn.disabled = currentPage === totalPages;
+    prevPageBtn.disabled = isLoading || currentPage === 1;
+    nextPageBtn.disabled = isLoading || currentPage === totalPages;
 }
 
 // create one post card from post object
@@ -133,7 +142,7 @@ function createPostCard(post) {
     return templateContent;
 }
 
-// render posts for current page
+// render posts for current page,,, UI
 function renderPosts() {
     const currentPosts = getCurrentPagePosts();
 
@@ -145,7 +154,28 @@ function renderPosts() {
     });
 }
 
-// one render flow
+// loader visibility
+function showLoader() {
+    blogLoader.hidden = false;
+    blogCardsContainer.hidden = true;
+    emptyPostsMessage.hidden = true;
+    pagination.hidden = true;
+}
+
+function hideLoader() {
+    blogLoader.hidden = true;
+    blogCardsContainer.hidden = false;
+}
+
+// disable / enable controls
+function setLoadingState(loading) {
+    isLoading = loading;
+    createPostBtn.disabled = loading;
+    showStatsBtn.disabled = loading;
+    updatePaginationControls();
+}
+
+// main render handler
 function render() {
     const totalPages = getTotalPages();
 
@@ -159,23 +189,45 @@ function render() {
     updatePaginationControls();
 }
 
+// init load articles  
+async function renderInitialPosts() {
+    setLoadingState(true);
+    showLoader();
+
+    try {
+        await wait(INITIAL_LOAD_DELAY);
+        loadPosts();
+        render();
+    } finally {
+        hideLoader();
+        setLoadingState(false);
+    }
+}
+
 // add a new post using form data
-function addPostFromForm() {
-    const post = {
-        title: titleInput.value.trim(),
-        content: contentInput.value.trim(),
-        date: getCurrentPublishedDate()
-    };
+async function addPostFromForm(post) {
+    setLoadingState(true);
+    showLoader();
 
-    posts.push(post);
-    savePosts();
+    try {
+        await wait(INITIAL_LOAD_DELAY);
 
-    currentPage = getTotalPages();
-    render();
+        posts.push(post);
+        savePosts();
+        currentPage = getTotalPages();
+        render();
+    } finally {
+        hideLoader();
+        setLoadingState(false);
+    }
 }
 
 // delete post when clicking delete button
 blogCardsContainer.addEventListener("click", function (event) {
+    if (isLoading) {
+        return;
+    }
+
     const deleteBtn = event.target.closest(".delete-post-btn");
 
     if (!deleteBtn) {
@@ -200,6 +252,10 @@ blogCardsContainer.addEventListener("click", function (event) {
 
 // pagination events
 prevPageBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
     if (currentPage > 1) {
         currentPage--;
         render();
@@ -207,6 +263,10 @@ prevPageBtn.addEventListener("click", function () {
 });
 
 nextPageBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
     if (currentPage < getTotalPages()) {
         currentPage++;
         render();
@@ -214,40 +274,88 @@ nextPageBtn.addEventListener("click", function () {
 });
 
 // button actions
-createPostBtn.addEventListener("click", openArticleDialog);
-closeArticleDialogBtn.addEventListener("click", closeArticleDialog);
+createPostBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
 
-showStatsBtn.addEventListener("click", openStatsDialog);
-closeStatsDialogBtn.addEventListener("click", closeStatsDialog);
+    openArticleDialog();
+});
 
-// add post on form submit
-blogForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    addPostFromForm();
-    blogForm.reset();
+closeArticleDialogBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
     closeArticleDialog();
 });
 
+showStatsBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
+    openStatsDialog();
+});
+
+closeStatsDialogBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
+    closeStatsDialog();
+});
+
+// add post on form submit
+blogForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (isLoading) {
+        return;
+    }
+
+    const post = {
+        title: titleInput.value.trim(),
+        content: contentInput.value.trim(),
+        date: getCurrentPublishedDate()
+    };
+
+    closeArticleDialog();
+    await addPostFromForm(post);
+    blogForm.reset();
+});
+
+
 // reset and close form on cancel button
 cancelFormBtn.addEventListener("click", function () {
+    if (isLoading) {
+        return;
+    }
+
     blogForm.reset();
     closeArticleDialog();
 });
 
 // close dialogs when clicking outside the dialog content
 articleDialog.addEventListener("click", function (event) {
+    if (isLoading) {
+        return;
+    }
+
     if (event.target === articleDialog) {
         closeArticleDialog();
     }
 });
 
 statsDialog.addEventListener("click", function (event) {
+    if (isLoading) {
+        return;
+    }
+
     if (event.target === statsDialog) {
         closeStatsDialog();
     }
 });
 
 // initial load and render
-loadPosts();
-
-render();
+renderInitialPosts();
