@@ -1,0 +1,19 @@
+<div class="page-shell blog-page">
+    <div class="blog-page-layout">
+        <app-blog-admin-panel [isLoading]="isLoading()" (openForm)="openForm()" (toggleStats)="toggleStats()" />
+
+        <main class="blog-main-content">
+            <app-blog-articles-section [isLoading]="isLoading()" [articles]="articles()" [currentPage]="currentPage()"
+                [totalPages]="totalPages()" (deleteArticle)="deleteArticle($event)" (previousPage)="goToPreviousPage()"
+                (nextPage)="goToNextPage()" />
+        </main>
+    </div>
+
+    @if (isFormVisible()) {
+    <app-article-form (closeForm)="closeForm()" (submitArticle)="addArticle($event)" />
+    }
+
+    @if (isStatsVisible()) {
+    <app-blog-stats-modal [articlesCount]="articlesCount()" (close)="closeStats()" />
+    }
+</div>

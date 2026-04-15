@@ -1,0 +1,30 @@
+<div class="article-dialog-backdrop" (click)="onClose()">
+    <div class="article-dialog-body" (click)="$event.stopPropagation()">
+        <button type="button" class="article-dialog-close" aria-label="Close article form" (click)="onClose()">
+            ×
+        </button>
+
+        <section class="blog-form-section">
+            <h2>Добавить статью</h2>
+
+            <form class="blog-form" (ngSubmit)="onSubmit()">
+                <label for="title">Заголовок</label>
+                <p>
+                    <input type="text" id="title" name="title" placeholder="Заголовок статьи" [(ngModel)]="title"
+                        required>
+                </p>
+
+                <label for="content">Текст статьи</label>
+                <p>
+                    <textarea id="content" name="content" rows="8" placeholder="Текст статьи" [(ngModel)]="content"
+                        required></textarea>
+                </p>
+
+                <p class="blog-form-actions">
+                    <button type="submit">Добавить</button>
+                    <button type="button" class="blog-form-cancel-btn" (click)="onClose()">Отмена</button>
+                </p>
+            </form>
+        </section>
+    </div>
+</div>

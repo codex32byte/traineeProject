@@ -1,0 +1,110 @@
+.article-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(31, 36, 50, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 200;
+}
+
+.article-dialog-body {
+  position: relative;
+  background-color: #f5f5f2;
+  border-radius: 20px;
+  padding: 32px 28px 26px;
+  max-width: 760px;
+  width: calc(100% - 32px);
+}
+
+.article-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.blog-form-section {
+  background-color: transparent;
+}
+
+.blog-form-section h2 {
+  margin-bottom: 18px;
+}
+
+.blog-form {
+  max-width: 620px;
+}
+
+.blog-form p {
+  margin: 0 0 16px;
+}
+
+.blog-form input,
+.blog-form textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(53, 56, 74, 0.18);
+  background-color: #ffffff;
+  color: var(--text-main);
+  outline: none;
+  border-radius: 10px;
+}
+
+.blog-form input:focus,
+.blog-form textarea:focus {
+  border-color: var(--accent-green);
+}
+
+.blog-form textarea {
+  resize: vertical;
+  min-height: 180px;
+}
+
+.blog-form button {
+  background-color: var(--accent-green);
+  color: #ffffff;
+  border: none;
+  padding: 12px 28px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: opacity 0.3s ease;
+}
+
+.blog-form button:hover,
+.blog-form button:focus {
+  opacity: 0.92;
+}
+
+.blog-form-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.blog-form-cancel-btn {
+  background-color: #d8dde5;
+  color: var(--text-main);
+}
+
+
+
+@media (max-width: 480px) {
+    .article-dialog-body {
+        padding: 26px 18px 20px;
+    }
+
+    .blog-form-actions {
+        flex-direction: column;
+    }
+
+    .blog-form button {
+        width: 100%;
+    }
+}

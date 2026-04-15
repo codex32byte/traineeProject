@@ -35,16 +35,17 @@
         </section>
 
         <section class="footer-right">
-            <form action="#" method="post">
+            <form (ngSubmit)="onSubmit()">
                 <p>
                     <label for="footer-email">Email</label><br>
-                    <input type="email" id="footer-email" name="footer-email" placeholder="Your email address">
+                    <input type="email" id="footer-email" name="email" [(ngModel)]="email"
+                        placeholder="Your email address" required>
                 </p>
 
                 <p>
                     <label for="footer-message">Input your message</label><br>
-                    <textarea id="footer-message" name="footer-message" rows="5"
-                        placeholder="Input your message"></textarea>
+                    <textarea id="footer-message" name="message" rows="5" [(ngModel)]="message"
+                        placeholder="Input your message" required></textarea>
                 </p>
 
                 <p>

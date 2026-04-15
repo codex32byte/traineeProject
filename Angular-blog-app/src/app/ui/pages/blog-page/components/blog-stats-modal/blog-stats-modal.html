@@ -1,0 +1,21 @@
+<div class="stats-dialog-backdrop" (click)="close.emit()">
+    <div class="stats-dialog-body" (click)="$event.stopPropagation()">
+        <button type="button" class="stats-dialog-close" aria-label="Close dialog" (click)="close.emit()">
+            ×
+        </button>
+
+        <h2 class="stats-dialog-title">Статистика страницы</h2>
+
+        <div class="stats-cards">
+            <div class="stats-card">
+                <p class="stats-card-label">Всего статей:</p>
+                <p class="stats-card-value">{{ articlesCount }}</p>
+            </div>
+
+            <div class="stats-card">
+                <p class="stats-card-label">Комментарии:</p>
+                <p class="stats-card-value">0</p>
+            </div>
+        </div>
+    </div>
+</div>
