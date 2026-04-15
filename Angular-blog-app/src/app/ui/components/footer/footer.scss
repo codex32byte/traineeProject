@@ -110,3 +110,38 @@
 .footer-right button:focus {
     opacity: 0.92;
 }
+
+
+
+@media (max-width: 1024px) {
+    .footer-shell {
+        grid-template-columns: 1fr;
+        padding: 34px 28px 28px;
+        gap: 36px;
+    }
+
+    .footer-left h2 {
+        font-size: 42px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-shell {
+        padding: 30px 20px 24px;
+    }
+
+    .footer-left h2 {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-left h2 {
+        font-size: 28px;
+    }
+
+    .footer-right button {
+        width: 100%;
+    }
+}

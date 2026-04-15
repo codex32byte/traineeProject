@@ -1,0 +1,21 @@
+@media (max-width: 1024px) {
+    .page-shell {
+        padding: 0 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-shell {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-shell {
+        padding: 0 16px;
+    }
+
+    h2 {
+        font-size: 32px;
+    }
+}

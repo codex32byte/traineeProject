@@ -1,0 +1,86 @@
+.admin-panel-icons {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 70px;
+  min-height: 150px;
+  background-color: #ffffff;
+  border-radius: 32px 0 0 32px;
+  box-shadow: 0 12px 24px rgba(31, 36, 50, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 18px 8px;
+  z-index: 90;
+}
+
+.admin-icon-btn {
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: transform 0.22s ease, background-color 0.22s ease;
+}
+
+.admin-icon-btn svg {
+  width: 30px;
+  height: 50px;
+  display: block;
+  transition: transform 0.22s ease;
+}
+
+.admin-icon-btn:hover,
+.admin-icon-btn:focus {
+  transform: scale(1.16);
+  background-color: rgba(87, 196, 92, 0.08);
+}
+
+.admin-icon-btn:hover svg,
+.admin-icon-btn:focus svg {
+  transform: scale(1.08);
+}
+
+.admin-icon-btn:active {
+  transform: scale(1.04);
+}
+
+.admin-icon-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .admin-panel-icons {
+    position: static;
+    transform: none;
+    width: 100%;
+    min-height: auto;
+    border-radius: 28px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 28px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-icon-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .admin-icon-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+}

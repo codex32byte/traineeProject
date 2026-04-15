@@ -1,0 +1,17 @@
+.blog-page-layout {
+  display: block;
+}
+
+.blog-main-content {
+  min-width: 0;
+}
+
+.blog-page .page-shell {
+  padding-right: 140px;
+}
+
+@media (max-width: 1024px) {
+  .blog-page .page-shell {
+    padding-right: 28px;
+  }
+}

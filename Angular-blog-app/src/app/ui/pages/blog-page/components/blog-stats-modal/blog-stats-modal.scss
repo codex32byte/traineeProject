@@ -1,0 +1,74 @@
+.stats-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(31, 36, 50, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 200;
+}
+
+.stats-dialog-body {
+  position: relative;
+  background-color: #f4f4f4;
+  border: 1px solid #d7d7d7;
+  border-radius: 10px;
+  padding: 24px 20px 18px;
+  max-width: 600px;
+  width: calc(100% - 32px);
+}
+
+.stats-dialog-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.stats-dialog-title {
+  margin: 0 0 14px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #000000;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.stats-card {
+  background-color: #efefef;
+  border: 1px solid #d3d3d3;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  padding: 12px 14px 10px;
+}
+
+.stats-card-label {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #4a4f5d;
+}
+
+.stats-card-value {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: #31384a;
+}
+
+@media (max-width: 480px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+}

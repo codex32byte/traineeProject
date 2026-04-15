@@ -1,9 +1,4 @@
 /* You can add global styles to this file, and also use other style files */
-@use'./styles/_common.scss';
-@use './styles/_fonts.scss';
-@use'./styles/_hero-section.scss';
-@use'./styles/_skills.scss';
-@use'./styles/_work.scss';
-@use'./styles/_hobby.scss';
-@use'./styles/_responsive.scss';
-@use'./styles/_recent-article';
+@use'./styles/common.scss';
+@use './styles/fonts.scss';
+@use'./styles/responsive.scss';
