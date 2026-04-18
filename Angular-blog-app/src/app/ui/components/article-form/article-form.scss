@@ -57,10 +57,6 @@
   border-radius: 10px;
 }
 
-.blog-form input:focus,
-.blog-form textarea:focus {
-  border-color: var(--accent-green);
-}
 
 .blog-form textarea {
   resize: vertical;
@@ -108,3 +104,5 @@
         width: 100%;
     }
 }
+
+

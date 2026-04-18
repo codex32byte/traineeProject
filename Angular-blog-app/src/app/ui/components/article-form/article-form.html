@@ -1,27 +1,37 @@
 <div class="article-dialog-backdrop" (click)="onClose()">
     <div class="article-dialog-body" (click)="$event.stopPropagation()">
         <button type="button" class="article-dialog-close" aria-label="Close article form" (click)="onClose()">
-            ×
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
         </button>
 
         <section class="blog-form-section">
-            <h2>Добавить статью</h2>
+            <h2>{{ isEditMode ? 'Редактировать статью' : 'Добавить статью' }}</h2>
 
-            <form class="blog-form" (ngSubmit)="onSubmit()">
+            <form class="blog-form" (ngSubmit)="onSubmit()" #articleForm="ngForm">
                 <label for="title">Заголовок</label>
                 <p>
-                    <input type="text" id="title" name="title" placeholder="Заголовок статьи" [(ngModel)]="title"
-                        required>
+                    <input type="text" id="title" name="title" placeholder="Заголовок статьи (минимум 25 символов)"
+                        [(ngModel)]="title" [class.error-input]="titleError" (input)="clearErrors()" required>
+                    @if (titleError) {
+                    <span class="error-message">{{ titleError }}</span>
+                    }
                 </p>
 
                 <label for="content">Текст статьи</label>
                 <p>
                     <textarea id="content" name="content" rows="8" placeholder="Текст статьи" [(ngModel)]="content"
-                        required></textarea>
+                        [class.error-input]="contentError" (input)="clearErrors()" required></textarea>
+                    @if (contentError) {
+                    <span class="error-message">{{ contentError }}</span>
+                    }
                 </p>
 
                 <p class="blog-form-actions">
-                    <button type="submit">Добавить</button>
+                    <button type="submit">{{ isEditMode ? 'Сохранить' : 'Добавить' }}</button>
                     <button type="button" class="blog-form-cancel-btn" (click)="onClose()">Отмена</button>
                 </p>
             </form>

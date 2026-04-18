@@ -1,12 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-interface BlogArticle {
-  id: string;
-  title: string;
-  content: string;
-  date: string;
-  image: string;
-}
+import { BlogArticle } from '../../../../models/blog-article.interface';
 
 @Component({
   selector: 'app-blog-articles-section',
@@ -28,12 +21,8 @@ export class BlogArticlesSection {
   // total available pages
   @Input({ required: true }) totalPages = 1;
 
-  // delete article event
   @Output() deleteArticle = new EventEmitter<string>();
-
-  // previous page event
+  @Output() editArticle = new EventEmitter<BlogArticle>();
   @Output() previousPage = new EventEmitter<void>();
-
-  // next page event
   @Output() nextPage = new EventEmitter<void>();
 }
