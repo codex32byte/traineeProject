@@ -4,13 +4,14 @@
 
         <main class="blog-main-content">
             <app-blog-articles-section [isLoading]="isLoading()" [articles]="articles()" [currentPage]="currentPage()"
-                [totalPages]="totalPages()" (deleteArticle)="deleteArticle($event)" (previousPage)="goToPreviousPage()"
-                (nextPage)="goToNextPage()" />
+                [totalPages]="totalPages()" (deleteArticle)="deleteArticle($event)" (editArticle)="editArticle($event)"
+                (previousPage)="goToPreviousPage()" (nextPage)="goToNextPage()" />
         </main>
     </div>
 
     @if (isFormVisible()) {
-    <app-article-form (closeForm)="closeForm()" (submitArticle)="addArticle($event)" />
+    <app-article-form [articleToEdit]="articleToEdit()" (closeForm)="closeForm()"
+        (submitArticle)="addArticle($event)" />
     }
 
     @if (isStatsVisible()) {

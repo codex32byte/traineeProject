@@ -111,7 +111,17 @@
     opacity: 0.92;
 }
 
+.form-success {
+  color: #28a745;
+  font-size: 14px;
+  margin: 12px 0;
+  padding: 10px 14px;
+  background-color: rgba(40, 167, 69, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #28a745;
+}
 
+/*responsive*/
 
 @media (max-width: 1024px) {
     .footer-shell {
@@ -145,3 +155,5 @@
         width: 100%;
     }
 }
+
+
