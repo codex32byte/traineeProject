@@ -36,7 +36,7 @@
         <section class="footer-right">
             <form #footerForm="ngForm" (ngSubmit)="onSubmit(footerForm)">
                 <p>
-                    <label for="footer-email">Email</label><br>
+                    <label for="footer-email">Email <span class="required-mark">*</span></label><br>
                     <input type="email" id="footer-email" name="email" [(ngModel)]="email" #emailField="ngModel"
                         placeholder="Your email address" required email [disabled]="isSubmitting">
 
@@ -49,7 +49,7 @@
                 </p>
 
                 <p>
-                    <label for="footer-message">Input your message</label><br>
+                    <label for="footer-message">Input your message <span class="required-mark">*</span></label><br>
                     <textarea id="footer-message" name="message" rows="5" [(ngModel)]="message" #messageField="ngModel"
                         placeholder="Input your message" required [disabled]="isSubmitting"></textarea>
 
