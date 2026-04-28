@@ -3,7 +3,7 @@ import { ArticleForm } from '../../components/article-form/article-form';
 import { BlogAdminPanel } from './components/blog-admin-panel/blog-admin-panel';
 import { BlogArticlesSection } from './components/blog-articles-section/blog-articles-section';
 import { BlogStatsModal } from './components/blog-stats-modal/blog-stats-modal';
-import { BlogArticle } from '../../models/blog-article.interface';
+import { BlogArticle, BlogArticleFormValue } from '../../models/blog-article.interface';
 
 @Component({
   selector: 'app-blog-page',
@@ -13,46 +13,47 @@ import { BlogArticle } from '../../models/blog-article.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogPage {
-  private initialLoadDelay = 700;
+  private readonly initialLoadDelay = 700;
   private readonly postsPerPage = 7;
 
-  private mockArticles: BlogArticle[] = [
+  private readonly mockArticles: BlogArticle[] = [
     {
       id: '1',
-      title: 'NETI-Link: Revolutionizing Student Achievement Verification',
+      title: 'NETI-Link blockchain student achievements',
       content: 'A secure blockchain service for presenting and verifying student achievements, helps students to find job opportunities based on their activity and achievements!',
       date: 'November 2, 2024',
-      image: 'assets/images/link1.webp'
+      image: 'assets/images/link1.webp',
     },
     {
       id: '2',
-      title: 'WebWave3 Cryptogate: Next Generation Education Payments',
+      title: 'WebWave3 Cryptogate education payments',
       content: 'A blockchain platform for education payments using smart contracts and digital transactions.',
       date: 'April 5, 2024',
-      image: 'assets/images/uni1.webp'
-    }
+      image: 'assets/images/uni1.webp',
+    },
   ];
 
-  isLoading = signal(true);
-  isFormVisible = signal(false);
-  isStatsVisible = signal(false);
-  currentPage = signal(1);
-  articleToEdit = signal<BlogArticle | null>(null);
+  protected readonly isLoading = signal(true);
+  protected readonly isFormVisible = signal(false);
+  protected readonly isStatsVisible = signal(false);
+  protected readonly currentPage = signal(1);
+  protected readonly articleToEdit = signal<BlogArticle | null>(null);
 
   // articles displayed on the current page
-  articles = signal<BlogArticle[]>([]);
+  protected readonly articles = signal<BlogArticle[]>([]);
 
   // total number of all articles
-  totalItems = signal(0);
+  private readonly totalItems = signal(0);
+
 
   // total pages
-  totalPages = computed(() => {
+  protected readonly totalPages = computed<number>(() => {
     const total = Math.ceil(this.totalItems() / this.postsPerPage);
     return total || 1;
   });
 
   // total articles count for statistics
-  articlesCount = computed(() => this.totalItems());
+  protected readonly articlesCount = computed<number>(() => this.totalItems());
 
   // init page loading
   constructor() {
@@ -60,8 +61,7 @@ export class BlogPage {
   }
 
   // loading current page articles
-
-  async loadArticles(): Promise<void> {
+  private async loadArticles(): Promise<void> {
     this.isLoading.set(true);
 
     try {
@@ -73,46 +73,69 @@ export class BlogPage {
     }
   }
 
+  protected async saveArticle(articleData: BlogArticleFormValue): Promise<void> {
+    const articleToEdit = this.articleToEdit();
+
+    if (articleToEdit) {
+      await this.updateArticle(articleToEdit.id, articleData);
+      return;
+    }
+
+    await this.addArticle(articleData);
+  }
+
   // add article
-  async addArticle(articleData: { title: string; content: string; id?: string }): Promise<void> {
+  private async addArticle(articleData: BlogArticleFormValue): Promise<void> {
     this.isLoading.set(true);
     this.closeForm();
 
     try {
       await this.wait(this.initialLoadDelay);
 
-      if (articleData.id) {
-        // Edit existing article
-        const articleIndex = this.mockArticles.findIndex(a => a.id === articleData.id);
-        if (articleIndex !== -1) {
-          this.mockArticles[articleIndex] = {
-            ...this.mockArticles[articleIndex],
-            title: articleData.title,
-            content: articleData.content,
-            date: new Date().toLocaleDateString('en-US', {
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric'
-            }) + ' (edited)'
-          };
-        }
-      } else {
-        // Add new article
-        const newArticle: BlogArticle = {
-          id: crypto.randomUUID(),
+      // Add new article
+      const newArticle: BlogArticle = {
+        id: crypto.randomUUID(),
+        title: articleData.title,
+        content: articleData.content,
+        date: new Date().toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        }),
+        image: 'assets/images/link1.webp',
+      };
+
+      this.mockArticles.push(newArticle);
+
+      const lastPage = Math.ceil(this.mockArticles.length / this.postsPerPage) || 1;
+      this.currentPage.set(lastPage);
+
+      const response = await this.fetchArticles(this.currentPage(), this.postsPerPage);
+      this.articles.set(response.items);
+      this.totalItems.set(response.totalItems);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  private async updateArticle(
+    id: string,
+    articleData: BlogArticleFormValue
+  ): Promise<void> {
+    this.isLoading.set(true);
+    this.closeForm();
+
+    try {
+      await this.wait(this.initialLoadDelay);
+
+      const articleIndex = this.mockArticles.findIndex(article => article.id === id);
+
+      if (articleIndex !== -1) {
+        this.mockArticles[articleIndex] = {
+          ...this.mockArticles[articleIndex],
           title: articleData.title,
           content: articleData.content,
-          date: new Date().toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-          }),
-          image: 'assets/images/link1.webp'
         };
-        this.mockArticles.push(newArticle);
-
-        const lastPage = Math.ceil(this.mockArticles.length / this.postsPerPage) || 1;
-        this.currentPage.set(lastPage);
       }
 
       const response = await this.fetchArticles(this.currentPage(), this.postsPerPage);
@@ -124,7 +147,7 @@ export class BlogPage {
   }
 
   // delete article
-  async deleteArticle(id: string): Promise<void> {
+  protected async deleteArticle(id: string): Promise<void> {
     if (this.isLoading()) {
       return;
     }
@@ -133,11 +156,13 @@ export class BlogPage {
 
     try {
       const articleIndex = this.mockArticles.findIndex(article => article.id === id);
+
       if (articleIndex !== -1) {
         this.mockArticles.splice(articleIndex, 1);
       }
 
       const expectedTotalPages = Math.ceil(this.mockArticles.length / this.postsPerPage) || 1;
+
       if (this.currentPage() > expectedTotalPages) {
         this.currentPage.set(expectedTotalPages);
       }
@@ -150,16 +175,8 @@ export class BlogPage {
     }
   }
 
-  editArticle(article: BlogArticle): void {
-    if (this.isLoading()) {
-      return;
-    }
-    this.articleToEdit.set(article);
-    this.isFormVisible.set(true);
-  }
-
   // pagination,,previous page
-  async goToPreviousPage(): Promise<void> {
+  protected async goToPreviousPage(): Promise<void> {
     if (this.isLoading() || this.currentPage() === 1) {
       return;
     }
@@ -169,7 +186,7 @@ export class BlogPage {
   }
 
   // pagination,,next page
-  async goToNextPage(): Promise<void> {
+  protected async goToNextPage(): Promise<void> {
     if (this.isLoading() || this.currentPage() === this.totalPages()) {
       return;
     }
@@ -179,33 +196,43 @@ export class BlogPage {
   }
 
   // opening add article form
-  openForm(): void {
+  protected openForm(): void {
     if (this.isLoading()) {
       return;
     }
+
     this.articleToEdit.set(null);
     this.isFormVisible.set(true);
   }
 
-  closeForm(): void {
+  protected openEditForm(article: BlogArticle): void {
+    if (this.isLoading()) {
+      return;
+    }
+
+    this.articleToEdit.set(article);
+    this.isFormVisible.set(true);
+  }
+
+  protected closeForm(): void {
     this.isFormVisible.set(false);
     this.articleToEdit.set(null);
   }
 
   // toggel statistics modal 
-  toggleStats(): void {
+  protected toggleStats(): void {
     if (this.isLoading()) {
       return;
     }
+
     this.isStatsVisible.update(value => !value);
   }
 
-  closeStats(): void {
+  protected closeStats(): void {
     this.isStatsVisible.set(false);
   }
 
   // fetching paginated articles for the current page
-
   private async fetchArticles(
     page: number,
     limit: number
@@ -218,7 +245,7 @@ export class BlogPage {
 
     return {
       items,
-      totalItems: this.mockArticles.length
+      totalItems: this.mockArticles.length,
     };
   }
 

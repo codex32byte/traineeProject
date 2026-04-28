@@ -1,88 +1,120 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { BlogArticle } from '../../models/blog-article.interface';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, effect, input, } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators, } from '@angular/forms';
+import { BlogArticle, BlogArticleFormValue, MinLengthValidationInfo, } from '../../models/blog-article.interface';
 
 @Component({
   selector: 'app-article-form',
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './article-form.html',
   styleUrl: './article-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArticleForm implements OnChanges {
-  @Input() articleToEdit: BlogArticle | null = null;
+export class ArticleForm {
+  readonly articleToEdit = input.required<BlogArticle | null>();
+
+  @Output() submitArticle = new EventEmitter<BlogArticleFormValue>();
   @Output() closeForm = new EventEmitter<void>();
-  @Output() submitArticle = new EventEmitter<{ title: string; content: string; id?: string }>();
 
-  title = '';
-  content = '';
-  isEditMode = false;
-  titleError = '';
-  contentError = '';
+  protected readonly form = new FormGroup({
+    title: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(25)],
+    }),
+    content: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['articleToEdit'] && this.articleToEdit) {
-      this.isEditMode = true;
-      this.title = this.articleToEdit.title;
-      this.content = this.articleToEdit.content;
-    } else {
-      this.isEditMode = false;
-      this.title = '';
-      this.content = '';
-    }
-    this.clearErrors();
+  private isEditMode = computed<boolean>(() => {
+    return Boolean(this.articleToEdit());
+  });
+
+  protected formTitle = computed<string>(() => {
+    return this.isEditMode() ? 'Изменить статью' : 'Добавить статью';
+  });
+
+  protected saveButtonTitle = computed<string>(() => {
+    return this.isEditMode() ? 'Сохранить' : 'Добавить';
+  });
+
+  constructor() {
+    this.editDataEffect();
   }
 
-  validateForm(): boolean {
-    this.clearErrors();
-    let isValid = true;
-
-    const trimmedTitle = this.title.trim();
-    const trimmedContent = this.content.trim();
-
-    if (!trimmedTitle) {
-      this.titleError = 'Заголовок обязателен';
-      isValid = false;
-    } else if (trimmedTitle.length < 25) {
-      this.titleError = `Заголовок должен содержать минимум 25 символов (сейчас ${trimmedTitle.length})`;
-      isValid = false;
-    }
-
-    if (!trimmedContent) {
-      this.contentError = 'Текст статьи обязателен';
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  clearErrors(): void {
-    this.titleError = '';
-    this.contentError = '';
-  }
-
-  // submitting form
-  onSubmit(): void {
-    if (!this.validateForm()) {
+  protected onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    const trimmedTitle = this.title.trim();
-    const trimmedContent = this.content.trim();
-
     this.submitArticle.emit({
-      title: trimmedTitle,
-      content: trimmedContent,
-      id: this.isEditMode && this.articleToEdit ? this.articleToEdit.id : undefined
+      title: this.form.controls.title.value.trim(),
+      content: this.form.controls.content.value.trim(),
     });
-
-    this.title = '';
-    this.content = '';
-    this.isEditMode = false;
-    this.clearErrors();
   }
 
-  onClose(): void {
+  protected onClose(): void {
     this.closeForm.emit();
+  }
+
+  protected hasError(controlName: keyof BlogArticleFormValue): boolean {
+    const control = this.form.get(controlName);
+    const isInvalid = control?.invalid && (control.touched || control.dirty);
+
+    return Boolean(isInvalid);
+  }
+
+  protected getControlError(controlName: keyof BlogArticleFormValue): string | null {
+    const control = this.form.get(controlName);
+    const errors: Record<string, unknown> | null = control?.errors ?? null;
+
+    if (!errors) {
+      return null;
+    }
+
+    const errorTextArray: string[] = [];
+
+    Object.entries(errors).forEach(([errorKey, errorValue]) => {
+      errorTextArray.push(this.getErrorStr(controlName, errorKey, errorValue));
+    });
+
+    return errorTextArray.join('\n');
+  }
+
+  private editDataEffect(): void {
+    effect(() => {
+      const articleToEdit = this.articleToEdit();
+
+      if (articleToEdit) {
+        this.form.patchValue({
+          title: articleToEdit.title,
+          content: articleToEdit.content,
+        });
+      } else {
+        this.form.reset();
+      }
+    });
+  }
+
+  private getErrorStr(
+    controlName: keyof BlogArticleFormValue,
+    errorCode: string,
+    errorData: unknown
+  ): string {
+    switch (errorCode) {
+      case 'required':
+        return controlName === 'title'
+          ? 'Заголовок обязателен'
+          : 'Текст статьи обязателен';
+
+      case 'minlength': {
+        const { requiredLength, actualLength } = errorData as MinLengthValidationInfo;
+        return `Нужно еще ${requiredLength - actualLength} символов`;
+      }
+
+      default:
+        return 'Ошибка при заполнении поля';
+    }
   }
 }

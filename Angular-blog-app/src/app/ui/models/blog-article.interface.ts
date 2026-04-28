@@ -5,3 +5,10 @@ export interface BlogArticle {
     date: string;
     image: string;
 }
+
+export type BlogArticleFormValue = Pick<BlogArticle, 'title' | 'content'>;
+
+export interface MinLengthValidationInfo {
+    requiredLength: number;
+    actualLength: number;
+}
