@@ -3,40 +3,20 @@
 
     <div class="Hobby-right-header">
         <p>
-            Web3 devs transfering real-asset into digital world through power of Blockchain!
+            Web3 devs transferring real-asset into the digital world through the power of Blockchain!
         </p>
     </div>
 
     <div class="projects-gallery">
-        <div class="gallery-item gallery-item-1">
-            <a href="https://nstu.ru/news/news_more?idnews=170745" target="_blank" class="gallery-link">
-                <img src="assets/images/hobby-1.webp" alt="Creative portrait project">
-
-                <div class="gallery-overlay gallery-overlay-image">
-                    <p>AVTF student showed his developments at the World Youth Festival</p>
+        @for (project of hobbyProjects; track project.id) {
+        <div class="gallery-item gallery-item-{{ project.id }}">
+            <a href="{{ project.link }}" target="_blank" class="gallery-link">
+                <img [src]="project.image" [alt]="project.title">
+                <div [class.gallery-overlay-image]="project.featured" class="gallery-overlay">
+                    <p>{{ project.description }}</p>
                 </div>
             </a>
         </div>
-
-        <div class="gallery-item gallery-item-2">
-            <img src="assets/images/blockchainIcon.webp" alt="Brand identity practice">
-            <div class="gallery-overlay">
-                <p>Blockchain Architecture</p>
-            </div>
-        </div>
-
-        <div class="gallery-item gallery-item-3">
-            <img src="assets/images/blockchainIcon2.webp" alt="Web layout experiment">
-            <div class="gallery-overlay">
-                <p>Smart Contracts As Middle man role</p>
-            </div>
-        </div>
-
-        <div class="gallery-item gallery-item-4">
-            <img src="assets/images/blockchainIcon3.webp" alt="Visual composition study">
-            <div class="gallery-overlay">
-                <p>Web3 Applications integeration with Blockchain</p>
-            </div>
-        </div>
+        }
     </div>
 </section>

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, computed } from '@angular/core';
+import { ArticlesStoreService } from '../../../../../services/articles/articles-store.service';
 
 @Component({
   selector: 'app-blog-stats-modal',
@@ -8,7 +9,10 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogStatsModal {
-  @Input({ required: true }) articlesCount = 0;
+  private readonly articlesStore = inject(ArticlesStoreService);
+
+
+  protected readonly articlesCount = computed(() => this.articlesStore.totalItems());
 
   @Output() close = new EventEmitter<void>();
 }

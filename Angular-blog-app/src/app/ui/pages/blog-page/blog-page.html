@@ -3,8 +3,9 @@
         <app-blog-admin-panel [isLoading]="isLoading()" (openForm)="openForm()" (toggleStats)="toggleStats()" />
 
         <main class="blog-main-content">
-            <app-blog-articles-section [isLoading]="isLoading()" [articles]="articles()" [currentPage]="currentPage()"
-                [totalPages]="totalPages()" (deleteArticle)="deleteArticle($event)" (editArticle)="openEditForm($event)"
+            <app-blog-articles-section [isLoading]="isLoading()" [articles]="articlesStore.articles()"
+                [currentPage]="articlesStore.activePage()" [totalPages]="totalPages()"
+                (deleteArticle)="deleteArticle($event)" (editArticle)="openEditForm($event)"
                 (previousPage)="goToPreviousPage()" (nextPage)="goToNextPage()" />
         </main>
     </div>
@@ -15,6 +16,6 @@
     }
 
     @if (isStatsVisible()) {
-    <app-blog-stats-modal [articlesCount]="articlesCount()" (close)="closeStats()" />
+    <app-blog-stats-modal (close)="closeStats()" />
     }
 </div>

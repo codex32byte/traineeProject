@@ -2,9 +2,13 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-skills-section',
-  imports: [],
   templateUrl: './skills-section.html',
-  styleUrl: './skills-section.scss',
+  styleUrls: ['./skills-section.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SkillsSection { }
+export class SkillsSection {
+  skills = [
+    "PHP", "SQL", "Solidity", "JavaScript", "React", "Next.js",
+    "Ethers.js", "Tailwind CSS", "Laravel", "MySQL", "PostgreSQL", "Blockchain"
+  ];
+}
