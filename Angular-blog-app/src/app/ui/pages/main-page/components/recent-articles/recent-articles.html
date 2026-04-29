@@ -1,35 +1,25 @@
+@if (latestArticles().length) {
 <section class="featured-posts">
+    @for (article of latestArticles(); track article.id) {
     <article class="post-card">
         <div class="post-card-content">
-            <p class="post-category">Student Profile floating over blockchain</p>
-            <h2>NETI-Link</h2>
+            <p class="post-category">{{ article.date }}</p>
+
+            <h2>{{ article.title }}</h2>
+
             <p>
-                A secure blockchain service for presenting and verifying student achievements,helps students
-                to find an job opportunities based on their activity and achievments!
+                {{ article.content }}
             </p>
         </div>
 
         <div class="post-card-image">
-            <img src="assets/images/link1.webp" alt="NETI-Link">
+            <img [src]="article.image" [alt]="article.title">
         </div>
     </article>
-
-    <article class="post-card">
-        <div class="post-card-content">
-            <p class="post-category">Payment Tuition Fees</p>
-            <h2>WebWave3 Cryptogate</h2>
-            <p>
-                A blockchain platform for education payments using smart contracts and digital
-                transactions.
-            </p>
-        </div>
-
-        <div class="post-card-image">
-            <img src="assets/images/uni1.webp" alt="WebWave3 Cryptogate">
-        </div>
-    </article>
+    }
 
     <p class="posts-link">
         <a routerLink="/blog">Browse all posts</a>
     </p>
 </section>
+}

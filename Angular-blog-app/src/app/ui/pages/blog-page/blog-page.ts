@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { take } from 'rxjs';
 import { ArticleForm } from '../../components/article-form/article-form';
 import { BlogAdminPanel } from './components/blog-admin-panel/blog-admin-panel';
 import { BlogArticlesSection } from './components/blog-articles-section/blog-articles-section';
 import { BlogStatsModal } from './components/blog-stats-modal/blog-stats-modal';
 import { BlogArticle, BlogArticleFormValue } from '../../models/blog-article.interface';
+import { ARTICLES_SERVICE } from '../../../services/articles/articles-service.token';
+import { ArticlesStoreService } from '../../../services/articles/articles-store.service';
 
 @Component({
   selector: 'app-blog-page',
@@ -16,137 +19,100 @@ export class BlogPage {
   private readonly initialLoadDelay = 700;
   private readonly postsPerPage = 7;
 
-  private readonly mockArticles: BlogArticle[] = [
-    {
-      id: '1',
-      title: 'NETI-Link blockchain student achievements',
-      content: 'A secure blockchain service for presenting and verifying student achievements, helps students to find job opportunities based on their activity and achievements!',
-      date: 'November 2, 2024',
-      image: 'assets/images/link1.webp',
-    },
-    {
-      id: '2',
-      title: 'WebWave3 Cryptogate education payments',
-      content: 'A blockchain platform for education payments using smart contracts and digital transactions.',
-      date: 'April 5, 2024',
-      image: 'assets/images/uni1.webp',
-    },
-  ];
+  private readonly articlesService = inject(ARTICLES_SERVICE);
+  protected readonly articlesStore = inject(ArticlesStoreService);
 
   protected readonly isLoading = signal(true);
   protected readonly isFormVisible = signal(false);
   protected readonly isStatsVisible = signal(false);
-  protected readonly currentPage = signal(1);
   protected readonly articleToEdit = signal<BlogArticle | null>(null);
-
-  // articles displayed on the current page
-  protected readonly articles = signal<BlogArticle[]>([]);
-
-  // total number of all articles
-  private readonly totalItems = signal(0);
-
 
   // total pages
   protected readonly totalPages = computed<number>(() => {
-    const total = Math.ceil(this.totalItems() / this.postsPerPage);
+    const total = Math.ceil(this.articlesStore.totalItems() / this.postsPerPage);
     return total || 1;
   });
 
-  // total articles count for statistics
-  protected readonly articlesCount = computed<number>(() => this.totalItems());
-
   // init page loading
   constructor() {
-    void this.loadArticles();
+    this.loadArticles();
   }
 
   // loading current page articles
   private async loadArticles(): Promise<void> {
     this.isLoading.set(true);
 
-    try {
-      const response = await this.fetchArticles(this.currentPage(), this.postsPerPage);
-      this.articles.set(response.items);
-      this.totalItems.set(response.totalItems);
-    } finally {
-      this.isLoading.set(false);
-    }
+
+    await this.wait(this.initialLoadDelay);
+
+    this.articlesService
+      .getArticles({
+        page: this.articlesStore.activePage(),
+        limit: this.postsPerPage,
+      })
+      .pipe(take(1))
+      .subscribe(response => {
+        this.saveArticlesResult(response);
+        this.isLoading.set(false);
+      });
   }
 
-  protected async saveArticle(articleData: BlogArticleFormValue): Promise<void> {
-    const articleToEdit = this.articleToEdit();
 
+  protected saveArticle(articleData: BlogArticleFormValue): void {
+    const articleToEdit = this.articleToEdit();
     if (articleToEdit) {
-      await this.updateArticle(articleToEdit.id, articleData);
+      this.updateArticle(articleToEdit.id, articleData);
       return;
     }
-
-    await this.addArticle(articleData);
+    this.addArticle(articleData);
   }
 
-  // add article
+  // add article 
   private async addArticle(articleData: BlogArticleFormValue): Promise<void> {
     this.isLoading.set(true);
     this.closeForm();
 
-    try {
-      await this.wait(this.initialLoadDelay);
+    const totalAfterAdding = this.articlesStore.totalItems() + 1;
+    const lastPage = Math.ceil(totalAfterAdding / this.postsPerPage) || 1;
 
-      // Add new article
-      const newArticle: BlogArticle = {
-        id: crypto.randomUUID(),
-        title: articleData.title,
-        content: articleData.content,
-        date: new Date().toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-        }),
-        image: 'assets/images/link1.webp',
-      };
+    this.articlesStore.savePaginationState(lastPage);
 
-      this.mockArticles.push(newArticle);
 
-      const lastPage = Math.ceil(this.mockArticles.length / this.postsPerPage) || 1;
-      this.currentPage.set(lastPage);
+    await this.wait(this.initialLoadDelay);
 
-      const response = await this.fetchArticles(this.currentPage(), this.postsPerPage);
-      this.articles.set(response.items);
-      this.totalItems.set(response.totalItems);
-    } finally {
-      this.isLoading.set(false);
-    }
+    this.articlesService
+      .addArticle(articleData, {
+        page: lastPage,
+        limit: this.postsPerPage,
+      })
+      .pipe(take(1))
+      .subscribe(response => {
+        this.saveArticlesResult(response);
+        this.isLoading.set(false);
+      });
   }
 
-  private async updateArticle(
-    id: string,
-    articleData: BlogArticleFormValue
-  ): Promise<void> {
+
+  private async updateArticle(id: string, articleData: BlogArticleFormValue): Promise<void> {
     this.isLoading.set(true);
     this.closeForm();
 
-    try {
-      await this.wait(this.initialLoadDelay);
 
-      const articleIndex = this.mockArticles.findIndex(article => article.id === id);
+    await this.wait(this.initialLoadDelay);
 
-      if (articleIndex !== -1) {
-        this.mockArticles[articleIndex] = {
-          ...this.mockArticles[articleIndex],
-          title: articleData.title,
-          content: articleData.content,
-        };
-      }
-
-      const response = await this.fetchArticles(this.currentPage(), this.postsPerPage);
-      this.articles.set(response.items);
-      this.totalItems.set(response.totalItems);
-    } finally {
-      this.isLoading.set(false);
-    }
+    this.articlesService
+      .updateArticle(id, articleData, {
+        page: this.articlesStore.activePage(),
+        limit: this.postsPerPage,
+      })
+      .pipe(take(1))
+      .subscribe(response => {
+        this.saveArticlesResult(response);
+        this.isLoading.set(false);
+      });
   }
 
-  // delete article
+  // delete article 
   protected async deleteArticle(id: string): Promise<void> {
     if (this.isLoading()) {
       return;
@@ -154,44 +120,44 @@ export class BlogPage {
 
     this.isLoading.set(true);
 
-    try {
-      const articleIndex = this.mockArticles.findIndex(article => article.id === id);
+    const expectedTotalItems = this.articlesStore.totalItems() - 1;
+    const expectedTotalPages = Math.ceil(expectedTotalItems / this.postsPerPage) || 1;
 
-      if (articleIndex !== -1) {
-        this.mockArticles.splice(articleIndex, 1);
-      }
-
-      const expectedTotalPages = Math.ceil(this.mockArticles.length / this.postsPerPage) || 1;
-
-      if (this.currentPage() > expectedTotalPages) {
-        this.currentPage.set(expectedTotalPages);
-      }
-
-      const response = await this.fetchArticles(this.currentPage(), this.postsPerPage);
-      this.articles.set(response.items);
-      this.totalItems.set(response.totalItems);
-    } finally {
-      this.isLoading.set(false);
+    if (this.articlesStore.activePage() > expectedTotalPages) {
+      this.articlesStore.savePaginationState(expectedTotalPages);
     }
+
+    await this.wait(this.initialLoadDelay);
+
+    this.articlesService
+      .deleteArticle(id, {
+        page: this.articlesStore.activePage(),
+        limit: this.postsPerPage,
+      })
+      .pipe(take(1))
+      .subscribe(response => {
+        this.saveArticlesResult(response);
+        this.isLoading.set(false);
+      });
   }
 
   // pagination,,previous page
   protected async goToPreviousPage(): Promise<void> {
-    if (this.isLoading() || this.currentPage() === 1) {
+    if (this.isLoading() || this.articlesStore.activePage() === 1) {
       return;
     }
 
-    this.currentPage.update(page => page - 1);
+    this.articlesStore.savePaginationState(this.articlesStore.activePage() - 1);
     await this.loadArticles();
   }
 
   // pagination,,next page
   protected async goToNextPage(): Promise<void> {
-    if (this.isLoading() || this.currentPage() === this.totalPages()) {
+    if (this.isLoading() || this.articlesStore.activePage() === this.totalPages()) {
       return;
     }
 
-    this.currentPage.update(page => page + 1);
+    this.articlesStore.savePaginationState(this.articlesStore.activePage() + 1);
     await this.loadArticles();
   }
 
@@ -219,7 +185,7 @@ export class BlogPage {
     this.articleToEdit.set(null);
   }
 
-  // toggel statistics modal 
+  // toggle statistics modal
   protected toggleStats(): void {
     if (this.isLoading()) {
       return;
@@ -232,24 +198,16 @@ export class BlogPage {
     this.isStatsVisible.set(false);
   }
 
-  // fetching paginated articles for the current page
-  private async fetchArticles(
-    page: number,
-    limit: number
-  ): Promise<{ items: BlogArticle[]; totalItems: number }> {
-    await this.wait(this.initialLoadDelay);
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const items = this.mockArticles.slice(startIndex, endIndex);
-
-    return {
-      items,
-      totalItems: this.mockArticles.length,
-    };
-  }
-
   private wait(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  private saveArticlesResult(response: {
+    items: BlogArticle[];
+    allItems: BlogArticle[];
+    totalItems: number;
+  }): void {
+    this.articlesStore.saveArticles(response.items, response.totalItems);
+  }
+
 }

@@ -6,7 +6,21 @@ export interface BlogArticle {
     image: string;
 }
 
-export type BlogArticleFormValue = Pick<BlogArticle, 'title' | 'content'>;
+export interface BlogArticleFormValue {
+    title: string;
+    content: string;
+}
+
+export interface ArticlesPaginationParams {
+    page: number;
+    limit: number;
+}
+
+export interface ArticlesPageResult {
+    items: BlogArticle[];
+    allItems: BlogArticle[];
+    totalItems: number;
+}
 
 export interface MinLengthValidationInfo {
     requiredLength: number;
