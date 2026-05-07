@@ -18,6 +18,7 @@
 }
 
 .admin-icon-btn {
+  color: var(--accent-green);
   width: 38px;
   height: 38px;
   border: none;
@@ -31,25 +32,29 @@
   transition: transform 0.22s ease, background-color 0.22s ease;
 }
 
-.admin-icon-btn svg {
+.admin-icon-btn mat-icon {
+  font-size: 30px;
   width: 30px;
-  height: 50px;
-  display: block;
+  height: 30px;
+  line-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.22s ease;
 }
 
-.admin-icon-btn:hover,
-.admin-icon-btn:focus {
+.admin-icon-btn:not(:disabled):hover,
+.admin-icon-btn:not(:disabled):focus {
   transform: scale(1.16);
   background-color: rgba(87, 196, 92, 0.08);
 }
 
-.admin-icon-btn:hover svg,
-.admin-icon-btn:focus svg {
+.admin-icon-btn:not(:disabled):hover mat-icon,
+.admin-icon-btn:not(:disabled):focus mat-icon {
   transform: scale(1.08);
 }
 
-.admin-icon-btn:active {
+.admin-icon-btn:not(:disabled):active {
   transform: scale(1.04);
 }
 
@@ -79,8 +84,10 @@
     height: 48px;
   }
 
-  .admin-icon-btn svg {
-    width: 22px;
-    height: 22px;
+  .admin-icon-btn mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
   }
 }

@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, DestroyRef } from '@angular/core';
 import { take } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ArticleForm } from '../../components/article-form/article-form';
 import { BlogAdminPanel } from './components/blog-admin-panel/blog-admin-panel';
 import { BlogArticlesSection } from './components/blog-articles-section/blog-articles-section';
@@ -20,6 +21,7 @@ export class BlogPage {
   private readonly postsPerPage = 7;
 
   private readonly articlesService = inject(ARTICLES_SERVICE);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly articlesStore = inject(ArticlesStoreService);
 
   protected readonly isLoading = signal(true);
@@ -50,7 +52,10 @@ export class BlogPage {
         page: this.articlesStore.activePage(),
         limit: this.postsPerPage,
       })
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe(response => {
         this.saveArticlesResult(response);
         this.isLoading.set(false);
@@ -85,7 +90,10 @@ export class BlogPage {
         page: lastPage,
         limit: this.postsPerPage,
       })
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe(response => {
         this.saveArticlesResult(response);
         this.isLoading.set(false);
@@ -105,7 +113,10 @@ export class BlogPage {
         page: this.articlesStore.activePage(),
         limit: this.postsPerPage,
       })
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe(response => {
         this.saveArticlesResult(response);
         this.isLoading.set(false);
@@ -134,7 +145,10 @@ export class BlogPage {
         page: this.articlesStore.activePage(),
         limit: this.postsPerPage,
       })
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe(response => {
         this.saveArticlesResult(response);
         this.isLoading.set(false);
