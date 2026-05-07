@@ -7,6 +7,7 @@ import { BlogArticlesSection } from './components/blog-articles-section/blog-art
 import { BlogStatsModal } from './components/blog-stats-modal/blog-stats-modal';
 import { BlogArticle, BlogArticleFormValue } from '../../models/blog-article.interface';
 import { ARTICLES_SERVICE } from '../../../services/articles/articles-service.token';
+import { ARTICLE_DETAILS_SERVICE } from '../../../services/article-details/article-details-service.token';
 import { ArticlesStoreService } from '../../../services/articles/articles-store.service';
 
 @Component({
@@ -21,7 +22,9 @@ export class BlogPage {
   private readonly postsPerPage = 7;
 
   private readonly articlesService = inject(ARTICLES_SERVICE);
+  private readonly articleDetailsService = inject(ARTICLE_DETAILS_SERVICE);
   private readonly destroyRef = inject(DestroyRef);
+
   protected readonly articlesStore = inject(ArticlesStoreService);
 
   protected readonly isLoading = signal(true);
@@ -44,7 +47,6 @@ export class BlogPage {
   private async loadArticles(): Promise<void> {
     this.isLoading.set(true);
 
-
     await this.wait(this.initialLoadDelay);
 
     this.articlesService
@@ -62,13 +64,14 @@ export class BlogPage {
       });
   }
 
-
   protected saveArticle(articleData: BlogArticleFormValue): void {
     const articleToEdit = this.articleToEdit();
+
     if (articleToEdit) {
       this.updateArticle(articleToEdit.id, articleData);
       return;
     }
+
     this.addArticle(articleData);
   }
 
@@ -81,7 +84,6 @@ export class BlogPage {
     const lastPage = Math.ceil(totalAfterAdding / this.postsPerPage) || 1;
 
     this.articlesStore.savePaginationState(lastPage);
-
 
     await this.wait(this.initialLoadDelay);
 
@@ -100,11 +102,9 @@ export class BlogPage {
       });
   }
 
-
   private async updateArticle(id: string, articleData: BlogArticleFormValue): Promise<void> {
     this.isLoading.set(true);
     this.closeForm();
-
 
     await this.wait(this.initialLoadDelay);
 
@@ -150,6 +150,7 @@ export class BlogPage {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(response => {
+        this.articleDetailsService.deleteArticleRelatedData(id);
         this.saveArticlesResult(response);
         this.isLoading.set(false);
       });
@@ -223,5 +224,4 @@ export class BlogPage {
   }): void {
     this.articlesStore.saveArticles(response.items, response.totalItems);
   }
-
 }
