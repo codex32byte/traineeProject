@@ -28,11 +28,25 @@
 }
 
 .hero-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
   font-size: 18px;
   font-weight: 500;
   color: var(--accent-green);
+  text-decoration: none;
   transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.hero-link mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero-link:hover,

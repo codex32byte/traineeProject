@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-blog-admin-panel',
   standalone: true,
+  imports: [MatIconModule],
   templateUrl: './blog-admin-panel.html',
   styleUrl: './blog-admin-panel.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

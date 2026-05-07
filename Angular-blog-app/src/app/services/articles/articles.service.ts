@@ -1,17 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import {
-  ArticlesPageResult,
-  ArticlesPaginationParams,
-  BlogArticle,
-  BlogArticleFormValue,
-} from '../../ui/models/blog-article.interface';
+import { ArticlesPageResult, ArticlesPaginationParams, BlogArticle, BlogArticleFormValue, } from '../../ui/models/blog-article.interface';
 import { ArticlesServiceInterface } from './articles-service.interface';
 import { ArticlesStoreService } from './articles-store.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
+
 export class ArticlesService implements ArticlesServiceInterface {
   private readonly storageKey = 'blogArticles';
 

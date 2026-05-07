@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, effect, input, } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { BlogArticle, BlogArticleFormValue, MinLengthValidationInfo, } from '../../models/blog-article.interface';
 
 @Component({
   selector: 'app-article-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MatIconModule],
   templateUrl: './article-form.html',
   styleUrl: './article-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +37,10 @@ export class ArticleForm {
 
   protected saveButtonTitle = computed<string>(() => {
     return this.isEditMode() ? 'Сохранить' : 'Добавить';
+  });
+
+  protected saveButtonIcon = computed<string>(() => {
+    return this.isEditMode() ? 'save' : 'add';
   });
 
   constructor() {

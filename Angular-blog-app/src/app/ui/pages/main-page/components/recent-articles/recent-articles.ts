@@ -1,8 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, computed, DestroyRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ARTICLES_SERVICE } from '../../../../../services/articles/articles-service.token';
 import { ArticlesStoreService } from '../../../../../services/articles/articles-store.service';
 import { take } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-recent-articles',
@@ -14,6 +15,7 @@ export class RecentArticles {
   private readonly postsPerPage = 7;
 
   private readonly articlesService = inject(ARTICLES_SERVICE);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly articlesStore = inject(ArticlesStoreService);
 
 
@@ -39,7 +41,10 @@ export class RecentArticles {
         page: this.articlesStore.activePage(),
         limit: this.postsPerPage,
       })
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe(response => {
         // Save articles and total items with the correct arguments
         this.articlesStore.saveArticles(response.items, response.totalItems);

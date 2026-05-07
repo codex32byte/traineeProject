@@ -1,0 +1,211 @@
+@if (isLoading()) {
+<div class="blog-loader">
+    <div class="blog-loader-dots" aria-label="Loading article">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+} @else if (article()) {
+<main class="article-page">
+    <div class="article-page__toolbar">
+        <button mat-stroked-button type="button" routerLink="/blog" class="article-page__back-btn">
+            <mat-icon fontSet="material-symbols-outlined">
+                arrow_back_ios_new
+            </mat-icon>
+            Back to blog
+        </button>
+    </div>
+
+    <mat-card class="article-post-card">
+        <figure class="article-post-media">
+            <img [src]="article()!.image" [alt]="article()!.title" />
+        </figure>
+
+        <article class="article-post-content">
+            <header class="article-post-header">
+                <div class="article-post-header__meta">
+                    <span class="article-post-header__badge">
+                        Admin
+                    </span>
+
+                    <span class="article-post-header__date">
+                        Published: {{ article()!.date }}
+                    </span>
+
+                    <div class="article-post-header__rating" aria-label="Article rating">
+                        <span class="article-post-header__rating-score">
+                            <mat-icon>star</mat-icon>
+                            {{ articleRating()?.average ?? 0 }} / 5
+                        </span>
+
+                        <span class="article-post-header__rating-votes">
+                            {{ articleRating()?.votesCount ?? 0 }}
+                            {{ (articleRating()?.votesCount ?? 0) === 1 ? 'rating' : 'ratings' }}
+                        </span>
+
+                        <div class="article-rating-stars" aria-label="Rate this article">
+                            @for (star of ratingStars; track star) {
+                            <button type="button" class="article-rating-stars__button"
+                                [class.article-rating-stars__button_active]="isArticleStarFilled(star)"
+                                [attr.aria-label]="'Rate article ' + star + ' stars'" (click)="setArticleRating(star)">
+                                <mat-icon>
+                                    {{ isArticleStarFilled(star) ? 'star' : 'star_border' }}
+                                </mat-icon>
+                            </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="article-post-header__title">
+                    {{ article()!.title }}
+                </h1>
+            </header>
+
+            <div class="article-post-body">
+                <p>
+                    {{ article()!.content }}
+                </p>
+            </div>
+        </article>
+    </mat-card>
+
+    <section class="article-discussion">
+        <mat-card class="article-comments-card">
+            <div class="article-section-header">
+                <div>
+                    <p class="article-section-header__eyebrow">
+                        Discussion
+                    </p>
+
+                    <h2>
+                        Comments
+                    </h2>
+                </div>
+
+                <span class="article-section-header__count">
+                    {{ comments().length }}
+                </span>
+            </div>
+
+            @if (comments().length) {
+            <div class="article-comments-list">
+                @for (comment of pagedComments(); track comment.id) {
+                <mat-card class="article-comment-card">
+                    <mat-card-header>
+                        <div mat-card-avatar class="article-comment-card__avatar">
+                            {{ comment.author.charAt(0).toUpperCase() }}
+                        </div>
+
+                        <mat-card-title>
+                            {{ comment.author }}
+                        </mat-card-title>
+
+                        <mat-card-subtitle>
+                            {{ comment.date }}
+                        </mat-card-subtitle>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                        <p class="article-comment-card__text">
+                            {{ comment.text }}
+                        </p>
+                    </mat-card-content>
+
+                    <mat-card-actions class="article-comment-card__actions">
+                        <button type="button" class="article-comment-card__like"
+                            [class.article-comment-card__like_active]="comment.isLikedByCurrentUser"
+                            (click)="toggleCommentLike(comment.id)">
+                            <mat-icon>
+                                {{ comment.isLikedByCurrentUser ? 'favorite' : 'favorite_border' }}
+                            </mat-icon>
+
+                            <span>
+                                {{ comment.isLikedByCurrentUser ? 'Liked' : 'Like' }}
+                            </span>
+                        </button>
+
+                        <span class="article-comment-card__likes-count">
+                            {{ comment.likesCount }}
+                            {{ comment.likesCount === 1 ? 'like' : 'likes' }}
+                        </span>
+                    </mat-card-actions>
+                </mat-card>
+                }
+            </div>
+
+            @if (comments().length > commentsPageSize()) {
+            <mat-paginator class="article-comments-paginator" [length]="comments().length"
+                [pageIndex]="commentsPageIndex()" [pageSize]="commentsPageSize()"
+                [pageSizeOptions]="commentsPageSizeOptions" [showFirstLastButtons]="true"
+                aria-label="Comments pagination" (page)="changeCommentsPage($event)">
+            </mat-paginator>
+            }
+            } @else {
+            <div class="article-comments-empty">
+                <mat-icon>chat_bubble_outline</mat-icon>
+
+                <p>
+                    No comments yet. Be the first to share your opinion.
+                </p>
+            </div>
+            }
+        </mat-card>
+
+        <mat-card class="article-comment-form-card">
+            <p class="article-section-header__eyebrow">
+                Join discussion
+            </p>
+
+            <h2>
+                Add comment
+            </h2>
+
+            <form [formGroup]="form" (ngSubmit)="addComment()">
+                <mat-form-field appearance="outline">
+                    <mat-label>Name</mat-label>
+
+                    <input matInput type="text" formControlName="author" placeholder="Your name" />
+
+                    @if (form.controls.author.invalid && form.controls.author.touched) {
+                    <mat-error>Name is required</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Comment</mat-label>
+
+                    <textarea matInput formControlName="text" placeholder="Write your comment" rows="5"></textarea>
+
+                    @if (form.controls.text.invalid && form.controls.text.touched) {
+                    <mat-error>Comment is required</mat-error>
+                    }
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" type="submit" class="article-comment-form-card__submit">
+                    <mat-icon>add_comment</mat-icon>
+                    Add comment
+                </button>
+            </form>
+        </mat-card>
+    </section>
+</main>
+} @else {
+<section class="article-details-empty">
+    <mat-icon>error_outline</mat-icon>
+
+    <h2>
+        Article not found
+    </h2>
+
+    <p>
+        The article does not exist or was removed.
+    </p>
+
+    <button mat-stroked-button type="button" routerLink="/blog">
+        <mat-icon>apps</mat-icon>
+        Back to blog
+    </button>
+</section>
+}

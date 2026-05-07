@@ -1,9 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { BlogArticle } from '../../../../models/blog-article.interface';
 
 @Component({
   selector: 'app-blog-articles-section',
   standalone: true,
+  imports: [RouterModule, MatIconModule, MatCardModule],
   templateUrl: './blog-articles-section.html',
   styleUrl: './blog-articles-section.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
