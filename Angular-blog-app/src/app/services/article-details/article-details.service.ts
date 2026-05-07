@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { ArticleComment, ArticleDetailsResult, ArticleRating, CommentFormValue, } from '../../ui/models/blog-article.interface';
+import {
+    ArticleComment,
+    ArticleDetailsResult,
+    ArticleRating,
+    CommentFormValue,
+} from '../../ui/models/blog-article.interface';
 import { ArticlesService } from '../articles/articles.service';
 import { ArticleDetailsServiceInterface } from './article-details-service.interface';
 
@@ -100,6 +105,17 @@ export class ArticleDetailsService implements ArticleDetailsServiceInterface {
         );
 
         return of(commentsCount);
+    }
+
+    public deleteArticleRelatedData(articleId: string): void {
+        const commentsMap = this.getCommentsMap();
+        const ratingsMap = this.getArticleRatingsMap();
+
+        delete commentsMap[articleId];
+        delete ratingsMap[articleId];
+
+        this.saveCommentsMap(commentsMap);
+        this.saveArticleRatingsMap(ratingsMap);
     }
 
     private getArticleById(articleId: string) {

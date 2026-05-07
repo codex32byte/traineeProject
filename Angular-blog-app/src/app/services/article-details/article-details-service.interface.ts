@@ -20,4 +20,7 @@ export interface ArticleDetailsServiceInterface {
     ): Observable<ArticleDetailsResult>;
 
     getCommentsCount(): Observable<number>;
+
+    deleteArticleRelatedData(articleId: string): void;
+
 }
