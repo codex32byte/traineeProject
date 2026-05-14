@@ -1,6 +1,6 @@
 export const environment = {
     production: false,
-    useBackendApi: false,
+    useBackendApi: true,
     apiUrl: '/api',
     apiOrigin: 'http://localhost:3000',
     emailjs: {
