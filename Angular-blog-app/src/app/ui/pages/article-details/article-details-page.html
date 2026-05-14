@@ -33,27 +33,38 @@
                         Published: {{ article()!.date }}
                     </span>
 
-                    <div class="article-post-header__rating" aria-label="Article rating">
+                    <div class="article-post-header__rating" aria-label="Article feedback">
                         <span class="article-post-header__rating-score">
-                            <mat-icon>star</mat-icon>
-                            {{ articleRating()?.average ?? 0 }} / 5
+                            <mat-icon>thumbs_up_down</mat-icon>
+                            Score: {{ articleRating()?.score ?? 0 }}
                         </span>
 
                         <span class="article-post-header__rating-votes">
-                            {{ articleRating()?.votesCount ?? 0 }}
-                            {{ (articleRating()?.votesCount ?? 0) === 1 ? 'rating' : 'ratings' }}
+                            Was this useful?
                         </span>
 
-                        <div class="article-rating-stars" aria-label="Rate this article">
-                            @for (star of ratingStars; track star) {
-                            <button type="button" class="article-rating-stars__button"
-                                [class.article-rating-stars__button_active]="isArticleStarFilled(star)"
-                                [attr.aria-label]="'Rate article ' + star + ' stars'" (click)="setArticleRating(star)">
-                                <mat-icon>
-                                    {{ isArticleStarFilled(star) ? 'star' : 'star_border' }}
-                                </mat-icon>
+                        <div class="article-vote-actions" aria-label="Vote for this article">
+                            <button type="button" class="article-vote-actions__button"
+                                [class.article-vote-actions__button_active]="isArticleVotedUp()"
+                                [disabled]="isVoting() || isArticleVotedUp()" aria-label="Mark article as useful"
+                                (click)="voteArticleUp()">
+                                <mat-icon>thumb_up</mat-icon>
+
+                                <span>
+                                    Useful
+                                </span>
                             </button>
-                            }
+
+                            <button type="button" class="article-vote-actions__button"
+                                [class.article-vote-actions__button_active]="isArticleVotedDown()"
+                                [disabled]="isVoting() || isArticleVotedDown()" aria-label="Mark article as not useful"
+                                (click)="voteArticleDown()">
+                                <mat-icon>thumb_down</mat-icon>
+
+                                <span>
+                                    Not useful
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -114,34 +125,27 @@
                     </mat-card-content>
 
                     <mat-card-actions class="article-comment-card__actions">
-                        <button type="button" class="article-comment-card__like"
-                            [class.article-comment-card__like_active]="comment.isLikedByCurrentUser"
-                            (click)="toggleCommentLike(comment.id)">
-                            <mat-icon>
-                                {{ comment.isLikedByCurrentUser ? 'favorite' : 'favorite_border' }}
-                            </mat-icon>
+                        <div class="article-comment-card__rating" aria-label="Comment rating">
+                            @for (star of commentRatingStars; track star) {
+                            <button type="button" class="article-comment-card__rating-button"
+                                [class.article-comment-card__rating-button_active]="isCommentStarFilled(comment.rating, star)"
+                                [disabled]="isCommentRatingUpdating()"
+                                [attr.aria-label]="'Rate comment ' + star + ' stars'"
+                                (click)="updateCommentRating(comment.id, star)">
+                                <mat-icon>
+                                    {{ isCommentStarFilled(comment.rating, star) ? 'star' : 'star_border' }}
+                                </mat-icon>
+                            </button>
+                            }
 
-                            <span>
-                                {{ comment.isLikedByCurrentUser ? 'Liked' : 'Like' }}
+                            <span class="article-comment-card__rating-value">
+                                {{ comment.rating }} / 5
                             </span>
-                        </button>
-
-                        <span class="article-comment-card__likes-count">
-                            {{ comment.likesCount }}
-                            {{ comment.likesCount === 1 ? 'like' : 'likes' }}
-                        </span>
+                        </div>
                     </mat-card-actions>
                 </mat-card>
                 }
             </div>
-
-            @if (comments().length > commentsPageSize()) {
-            <mat-paginator class="article-comments-paginator" [length]="comments().length"
-                [pageIndex]="commentsPageIndex()" [pageSize]="commentsPageSize()"
-                [pageSizeOptions]="commentsPageSizeOptions" [showFirstLastButtons]="true"
-                aria-label="Comments pagination" (page)="changeCommentsPage($event)">
-            </mat-paginator>
-            }
             } @else {
             <div class="article-comments-empty">
                 <mat-icon>chat_bubble_outline</mat-icon>
@@ -151,44 +155,17 @@
                 </p>
             </div>
             }
+
+            @if (comments().length > commentsPageSize()) {
+            <mat-paginator class="article-comments-paginator" [length]="comments().length"
+                [pageIndex]="commentsPageIndex()" [pageSize]="commentsPageSize()"
+                [pageSizeOptions]="commentsPageSizeOptions" [showFirstLastButtons]="true"
+                aria-label="Comments pagination" (page)="changeCommentsPage($event)">
+            </mat-paginator>
+            }
         </mat-card>
 
-        <mat-card class="article-comment-form-card">
-            <p class="article-section-header__eyebrow">
-                Join discussion
-            </p>
-
-            <h2>
-                Add comment
-            </h2>
-
-            <form [formGroup]="form" (ngSubmit)="addComment()">
-                <mat-form-field appearance="outline">
-                    <mat-label>Name</mat-label>
-
-                    <input matInput type="text" formControlName="author" placeholder="Your name" />
-
-                    @if (form.controls.author.invalid && form.controls.author.touched) {
-                    <mat-error>Name is required</mat-error>
-                    }
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                    <mat-label>Comment</mat-label>
-
-                    <textarea matInput formControlName="text" placeholder="Write your comment" rows="5"></textarea>
-
-                    @if (form.controls.text.invalid && form.controls.text.touched) {
-                    <mat-error>Comment is required</mat-error>
-                    }
-                </mat-form-field>
-
-                <button mat-raised-button color="primary" type="submit" class="article-comment-form-card__submit">
-                    <mat-icon>add_comment</mat-icon>
-                    Add comment
-                </button>
-            </form>
-        </mat-card>
+        <app-article-comment-form (commentSubmit)="addComment($event)"></app-article-comment-form>
     </section>
 </main>
 } @else {

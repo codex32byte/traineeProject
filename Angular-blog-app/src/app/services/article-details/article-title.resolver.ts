@@ -1,17 +1,30 @@
 import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
-import { map } from 'rxjs';
-import { ARTICLE_DETAILS_SERVICE } from './article-details-service.token';
+import { catchError, map, of } from 'rxjs';
+
+import { ARTICLES_SERVICE } from '../articles/articles-service.token';
+import { ArticlesStoreService } from '../articles/articles-store.service';
 
 export const articleTitleResolver: ResolveFn<string> = route => {
-    const articleDetailsService = inject(ARTICLE_DETAILS_SERVICE);
+    const articlesService = inject(ARTICLES_SERVICE);
+    const articlesStore = inject(ArticlesStoreService);
     const articleId = route.paramMap.get('id');
 
     if (!articleId) {
         return 'Article not found';
     }
 
-    return articleDetailsService.getArticleDetails(articleId).pipe(
-        map(response => response.article?.title ?? 'Article not found')
+    const cachedArticle = [
+        ...articlesStore.articles(),
+        ...articlesStore.latestArticles(),
+    ].find(article => article.id === articleId);
+
+    if (cachedArticle) {
+        return cachedArticle.title;
+    }
+
+    return articlesService.getArticleById(articleId).pipe(
+        map(article => article?.title ?? 'Article not found'),
+        catchError(() => of('Article not found'))
     );
 };

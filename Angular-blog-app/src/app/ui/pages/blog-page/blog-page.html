@@ -3,6 +3,12 @@
         <app-blog-admin-panel [isLoading]="isLoading()" (openForm)="openForm()" (toggleStats)="toggleStats()" />
 
         <main class="blog-main-content">
+            @if (requestError()) {
+            <p class="blog-error-message">
+                {{ requestError() }}
+            </p>
+            }
+
             <app-blog-articles-section [isLoading]="isLoading()" [articles]="articlesStore.articles()"
                 [currentPage]="articlesStore.activePage()" [totalPages]="totalPages()"
                 (deleteArticle)="deleteArticle($event)" (editArticle)="openEditForm($event)"

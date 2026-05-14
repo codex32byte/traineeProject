@@ -1,5 +1,5 @@
 export const environment = {
-    production: false,
+    production: true,
     useBackendApi: false,
     apiUrl: '/api',
     apiOrigin: 'http://localhost:3000',

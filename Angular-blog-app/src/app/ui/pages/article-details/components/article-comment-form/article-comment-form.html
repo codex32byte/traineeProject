@@ -1,0 +1,61 @@
+<mat-card class="article-comment-form-card">
+    <p class="article-section-header__eyebrow">
+        Join discussion
+    </p>
+
+    <h2>
+        Add comment
+    </h2>
+
+    <form [formGroup]="form" (ngSubmit)="submitComment()">
+        <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+
+            <input matInput type="text" formControlName="author" placeholder="Your name" />
+
+            @if (form.controls.author.invalid && form.controls.author.touched) {
+            <mat-error>Name is required</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Comment</mat-label>
+
+            <textarea matInput formControlName="text" placeholder="Write your comment" rows="5"></textarea>
+
+            @if (form.controls.text.invalid && form.controls.text.touched) {
+            <mat-error>Comment is required</mat-error>
+            }
+        </mat-form-field>
+
+        <div class="article-comment-rating-field">
+            <p class="article-comment-rating-field__label">
+                Comment rating <span class="required-mark">*</span>
+            </p>
+
+            <div class="article-comment-rating-stars" aria-label="Rate your comment">
+                @for (star of ratingStars; track star) {
+                <button type="button" class="article-comment-rating-stars__button"
+                    [class.article-comment-rating-stars__button_active]="isRatingStarFilled(star)"
+                    [attr.aria-label]="'Rate comment ' + star + ' stars'" (click)="setRating(star)">
+                    <mat-icon>
+                        {{ isRatingStarFilled(star) ? 'star' : 'star_border' }}
+                    </mat-icon>
+                </button>
+                }
+            </div>
+
+            @if (hasRatingError()) {
+            <span class="article-comment-rating-field__error">
+                Rating is required
+            </span>
+            }
+        </div>
+
+        <button mat-raised-button color="primary" type="submit" class="article-comment-form-card__submit"
+            [disabled]="form.invalid">
+            <mat-icon>add_comment</mat-icon>
+            Add comment
+        </button>
+    </form>
+</mat-card>

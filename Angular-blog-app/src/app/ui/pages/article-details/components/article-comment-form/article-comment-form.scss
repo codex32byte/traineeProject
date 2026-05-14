@@ -1,0 +1,132 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 24px;
+}
+
+.article-comment-form-card {
+  padding: 26px;
+  border-radius: 24px;
+  border: 1px solid rgba(53, 56, 74, 0.08);
+  background-color: #ffffff;
+  box-shadow: 0 14px 28px rgba(31, 36, 50, 0.06);
+}
+
+.article-section-header__eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-green);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.article-comment-form-card h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.article-comment-form-card form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.article-comment-rating-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.article-comment-rating-field__label {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.required-mark {
+  color: #ff5a5f;
+}
+
+.article-comment-rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.article-comment-rating-stars__button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background-color: transparent;
+  color: #c4cad5;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.article-comment-rating-stars__button mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+}
+
+.article-comment-rating-stars__button:hover,
+.article-comment-rating-stars__button:focus {
+  color: var(--accent-green);
+  background-color: rgba(87, 196, 92, 0.12);
+  transform: scale(1.08);
+}
+
+.article-comment-rating-stars__button_active {
+  color: var(--accent-green);
+}
+
+.article-comment-rating-field__error {
+  color: #ff5a5f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.article-comment-form-card__submit {
+  width: fit-content;
+}
+
+.article-comment-form-card__submit mat-icon {
+  margin-right: 6px;
+}
+
+@media (max-width: 1100px) {
+  :host {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .article-comment-form-card {
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .article-comment-form-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .article-comment-form-card__submit {
+    width: 100%;
+  }
+}

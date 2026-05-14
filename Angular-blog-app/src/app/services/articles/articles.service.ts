@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { ArticlesPageResult, ArticlesPaginationParams, BlogArticle, BlogArticleFormValue, } from '../../ui/models/blog-article.interface';
+import {
+  ArticlesPageResult,
+  ArticlesPaginationParams,
+  BlogArticle,
+  BlogArticleFormValue,
+} from '../../ui/models/blog-article.interface';
 import { ArticlesServiceInterface } from './articles-service.interface';
-import { ArticlesStoreService } from './articles-store.service';
 
 @Injectable()
-
 export class ArticlesService implements ArticlesServiceInterface {
   private readonly storageKey = 'blogArticles';
 
@@ -17,6 +20,8 @@ export class ArticlesService implements ArticlesServiceInterface {
         'A secure blockchain service for presenting and verifying student achievements, helps students to find job opportunities based on their activity and achievements!',
       date: 'November 2, 2024',
       image: 'assets/images/link1.webp',
+      categoryId: null,
+      rating: 0,
     },
     {
       id: '2',
@@ -25,14 +30,28 @@ export class ArticlesService implements ArticlesServiceInterface {
         'A blockchain platform for education payments using smart contracts and digital transactions.',
       date: 'April 5, 2024',
       image: 'assets/images/uni1.webp',
+      categoryId: null,
+      rating: 0,
     },
   ];
 
-  constructor(private articlesStore: ArticlesStoreService) { }
-
   public getArticles(params: ArticlesPaginationParams): Observable<ArticlesPageResult> {
     const articles = this.getArticlesFromStorage();
+
     return of(this.getPageResult(articles, params));
+  }
+
+  public getArticleById(id: string): Observable<BlogArticle | null> {
+    const article =
+      this.getArticlesFromStorage().find(article => article.id === id) ?? null;
+
+    return of(article);
+  }
+
+  public getLatestArticles(limit: number): Observable<BlogArticle[]> {
+    const articles = this.getArticlesFromStorage();
+
+    return of(articles.slice(0, limit));
   }
 
   public addArticle(
@@ -51,11 +70,13 @@ export class ArticlesService implements ArticlesServiceInterface {
         year: 'numeric',
       }),
       image: 'assets/images/link1.webp',
+      categoryId: articleData.categoryId ?? null,
+      rating: 0,
     };
 
-    const updatedArticles = [...articles, newArticle];
+    const updatedArticles = [newArticle, ...articles];
+
     this.saveArticlesToStorage(updatedArticles);
-    this.articlesStore.saveArticles(updatedArticles, updatedArticles.length);
 
     return of(this.getPageResult(updatedArticles, params));
   }
@@ -76,11 +97,11 @@ export class ArticlesService implements ArticlesServiceInterface {
         ...article,
         title: articleData.title,
         content: articleData.content,
+        categoryId: articleData.categoryId ?? null,
       };
     });
 
     this.saveArticlesToStorage(updatedArticles);
-    this.articlesStore.saveArticles(updatedArticles, updatedArticles.length);
 
     return of(this.getPageResult(updatedArticles, params));
   }
@@ -92,13 +113,21 @@ export class ArticlesService implements ArticlesServiceInterface {
     const articles = this.getArticlesFromStorage();
 
     const updatedArticles = articles.filter(article => article.id !== id);
+
     this.saveArticlesToStorage(updatedArticles);
-    this.articlesStore.saveArticles(updatedArticles, updatedArticles.length);
 
     return of(this.getPageResult(updatedArticles, params));
   }
 
-  public getArticlesFromStorage(): BlogArticle[] {
+  public voteArticleUp(id: string): Observable<BlogArticle | null> {
+    return of(this.changeArticleRating(id, 1));
+  }
+
+  public voteArticleDown(id: string): Observable<BlogArticle | null> {
+    return of(this.changeArticleRating(id, -1));
+  }
+
+  private getArticlesFromStorage(): BlogArticle[] {
     const articlesJson = localStorage.getItem(this.storageKey);
 
     if (!articlesJson) {
@@ -107,6 +136,28 @@ export class ArticlesService implements ArticlesServiceInterface {
     }
 
     return JSON.parse(articlesJson) as BlogArticle[];
+  }
+
+  private changeArticleRating(id: string, ratingChange: number): BlogArticle | null {
+    const articles = this.getArticlesFromStorage();
+    let updatedArticle: BlogArticle | null = null;
+
+    const updatedArticles = articles.map(article => {
+      if (article.id !== id) {
+        return article;
+      }
+
+      updatedArticle = {
+        ...article,
+        rating: (article.rating ?? 0) + ratingChange,
+      };
+
+      return updatedArticle;
+    });
+
+    this.saveArticlesToStorage(updatedArticles);
+
+    return updatedArticle;
   }
 
   private saveArticlesToStorage(articles: BlogArticle[]): void {
