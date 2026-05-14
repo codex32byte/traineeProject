@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, DestroyRef } from '@angular/core';
-import { take } from 'rxjs';
+import { Observable, map, of, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ArticleForm } from '../../components/article-form/article-form';
 import { BlogAdminPanel } from './components/blog-admin-panel/blog-admin-panel';
 import { BlogArticlesSection } from './components/blog-articles-section/blog-articles-section';
 import { BlogStatsModal } from './components/blog-stats-modal/blog-stats-modal';
-import { BlogArticle, BlogArticleFormValue } from '../../models/blog-article.interface';
+import { ArticlesPageResult, BlogArticle, BlogArticleFormValue } from '../../models/blog-article.interface';
 import { ARTICLES_SERVICE } from '../../../services/articles/articles-service.token';
 import { ARTICLE_DETAILS_SERVICE } from '../../../services/article-details/article-details-service.token';
+import { CATEGORIES_SERVICE } from '../../../services/categories/categories-service.token';
 import { ArticlesStoreService } from '../../../services/articles/articles-store.service';
 
 @Component({
@@ -18,11 +19,11 @@ import { ArticlesStoreService } from '../../../services/articles/articles-store.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogPage {
-  private readonly initialLoadDelay = 700;
   private readonly postsPerPage = 7;
-
+  private readonly latestArticlesLimit = 2;
   private readonly articlesService = inject(ARTICLES_SERVICE);
   private readonly articleDetailsService = inject(ARTICLE_DETAILS_SERVICE);
+  private readonly categoriesService = inject(CATEGORIES_SERVICE);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly articlesStore = inject(ArticlesStoreService);
@@ -31,6 +32,7 @@ export class BlogPage {
   protected readonly isFormVisible = signal(false);
   protected readonly isStatsVisible = signal(false);
   protected readonly articleToEdit = signal<BlogArticle | null>(null);
+  protected readonly requestError = signal<string | null>(null);
 
   // total pages
   protected readonly totalPages = computed<number>(() => {
@@ -44,10 +46,9 @@ export class BlogPage {
   }
 
   // loading current page articles
-  private async loadArticles(): Promise<void> {
+  private loadArticles(): void {
+    this.requestError.set(null);
     this.isLoading.set(true);
-
-    await this.wait(this.initialLoadDelay);
 
     this.articlesService
       .getArticles({
@@ -58,9 +59,14 @@ export class BlogPage {
         take(1),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(response => {
-        this.saveArticlesResult(response);
-        this.isLoading.set(false);
+      .subscribe({
+        next: response => {
+          this.saveArticlesResult(response);
+          this.isLoading.set(false);
+        },
+        error: error => {
+          this.handleRequestError(error, 'Не удалось загрузить статьи');
+        },
       });
   }
 
@@ -76,104 +82,124 @@ export class BlogPage {
   }
 
   // add article 
-  private async addArticle(articleData: BlogArticleFormValue): Promise<void> {
+  private addArticle(articleData: BlogArticleFormValue): void {
+    this.requestError.set(null);
     this.isLoading.set(true);
     this.closeForm();
 
-    const totalAfterAdding = this.articlesStore.totalItems() + 1;
-    const lastPage = Math.ceil(totalAfterAdding / this.postsPerPage) || 1;
+    const targetPage = 1;
 
-    this.articlesStore.savePaginationState(lastPage);
-
-    await this.wait(this.initialLoadDelay);
-
-    this.articlesService
-      .addArticle(articleData, {
-        page: lastPage,
-        limit: this.postsPerPage,
-      })
+    this.prepareArticleData(articleData)
       .pipe(
+        switchMap(preparedArticleData =>
+          this.articlesService.addArticle(preparedArticleData, {
+            page: targetPage,
+            limit: this.postsPerPage,
+          })
+        ),
         take(1),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(response => {
-        this.saveArticlesResult(response);
-        this.isLoading.set(false);
+      .subscribe({
+        next: response => {
+          this.articlesStore.savePaginationState(targetPage);
+          this.saveArticlesResult(response);
+          this.isLoading.set(false);
+        },
+        error: error => {
+          this.isFormVisible.set(true);
+          this.handleRequestError(error, 'Не удалось добавить статью');
+        },
       });
   }
 
-  private async updateArticle(id: string, articleData: BlogArticleFormValue): Promise<void> {
+  private updateArticle(id: string, articleData: BlogArticleFormValue): void {
+    this.requestError.set(null);
     this.isLoading.set(true);
     this.closeForm();
 
-    await this.wait(this.initialLoadDelay);
-
-    this.articlesService
-      .updateArticle(id, articleData, {
-        page: this.articlesStore.activePage(),
-        limit: this.postsPerPage,
-      })
+    this.prepareArticleData(articleData)
       .pipe(
+        switchMap(preparedArticleData =>
+          this.articlesService.updateArticle(id, preparedArticleData, {
+            page: this.articlesStore.activePage(),
+            limit: this.postsPerPage,
+          })
+        ),
         take(1),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(response => {
-        this.saveArticlesResult(response);
-        this.isLoading.set(false);
+      .subscribe({
+        next: response => {
+          this.saveArticlesResult(response);
+          this.isLoading.set(false);
+        },
+        error: error => {
+          const article = this.articlesStore.articles().find(article => article.id === id) ?? null;
+
+          this.articleToEdit.set(article);
+          this.isFormVisible.set(Boolean(article));
+          this.handleRequestError(error, 'Не удалось изменить статью');
+        },
       });
   }
 
   // delete article 
-  protected async deleteArticle(id: string): Promise<void> {
+  protected deleteArticle(id: string): void {
     if (this.isLoading()) {
       return;
     }
 
+    this.requestError.set(null);
     this.isLoading.set(true);
 
     const expectedTotalItems = this.articlesStore.totalItems() - 1;
     const expectedTotalPages = Math.ceil(expectedTotalItems / this.postsPerPage) || 1;
-
-    if (this.articlesStore.activePage() > expectedTotalPages) {
-      this.articlesStore.savePaginationState(expectedTotalPages);
-    }
-
-    await this.wait(this.initialLoadDelay);
+    const targetPage =
+      this.articlesStore.activePage() > expectedTotalPages
+        ? expectedTotalPages
+        : this.articlesStore.activePage();
 
     this.articlesService
       .deleteArticle(id, {
-        page: this.articlesStore.activePage(),
+        page: targetPage,
         limit: this.postsPerPage,
       })
       .pipe(
         take(1),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(response => {
-        this.articleDetailsService.deleteArticleRelatedData(id);
-        this.saveArticlesResult(response);
-        this.isLoading.set(false);
+      .subscribe({
+        next: response => {
+          this.articleDetailsService.deleteArticleRelatedData(id);
+          this.articlesStore.savePaginationState(targetPage);
+          this.saveArticlesResult(response);
+          this.isLoading.set(false);
+        },
+        error: error => {
+          this.handleRequestError(error, 'Не удалось удалить статью');
+        },
       });
   }
 
   // pagination,,previous page
-  protected async goToPreviousPage(): Promise<void> {
+  protected goToPreviousPage(): void {
     if (this.isLoading() || this.articlesStore.activePage() === 1) {
       return;
     }
 
     this.articlesStore.savePaginationState(this.articlesStore.activePage() - 1);
-    await this.loadArticles();
+    this.loadArticles();
   }
 
   // pagination,,next page
-  protected async goToNextPage(): Promise<void> {
+  protected goToNextPage(): void {
     if (this.isLoading() || this.articlesStore.activePage() === this.totalPages()) {
       return;
     }
 
     this.articlesStore.savePaginationState(this.articlesStore.activePage() + 1);
-    await this.loadArticles();
+    this.loadArticles();
   }
 
   // opening add article form
@@ -182,6 +208,7 @@ export class BlogPage {
       return;
     }
 
+    this.requestError.set(null);
     this.articleToEdit.set(null);
     this.isFormVisible.set(true);
   }
@@ -191,6 +218,7 @@ export class BlogPage {
       return;
     }
 
+    this.requestError.set(null);
     this.articleToEdit.set(article);
     this.isFormVisible.set(true);
   }
@@ -213,15 +241,50 @@ export class BlogPage {
     this.isStatsVisible.set(false);
   }
 
-  private wait(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  private prepareArticleData(articleData: BlogArticleFormValue): Observable<BlogArticleFormValue> {
+    const categoryName = articleData.categoryName?.trim();
+
+    if (!categoryName) {
+      return of({
+        ...articleData,
+        categoryId: null,
+      });
+    }
+
+    return this.categoriesService.getOrCreateCategory(categoryName).pipe(
+      map(category => ({
+        ...articleData,
+        categoryId: category.id,
+        categoryName: category.name,
+      }))
+    );
   }
 
-  private saveArticlesResult(response: {
-    items: BlogArticle[];
-    allItems: BlogArticle[];
-    totalItems: number;
-  }): void {
+  private saveArticlesResult(response: ArticlesPageResult): void {
     this.articlesStore.saveArticles(response.items, response.totalItems);
+    this.refreshLatestArticles();
+  }
+
+  private refreshLatestArticles(): void {
+    this.articlesService
+      .getLatestArticles(this.latestArticlesLimit)
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: articles => {
+          this.articlesStore.saveLatestArticles(articles);
+        },
+        error: error => {
+          console.error('Failed to refresh latest articles:', error);
+        },
+      });
+  }
+
+  private handleRequestError(error: unknown, fallbackMessage: string): void {
+    console.error(fallbackMessage, error);
+    this.requestError.set(fallbackMessage);
+    this.isLoading.set(false);
   }
 }

@@ -1,5 +1,8 @@
 import { Observable } from 'rxjs';
-import { ArticleDetailsResult, CommentFormValue, } from '../../ui/models/blog-article.interface';
+import {
+    ArticleDetailsResult,
+    CommentFormValue,
+} from '../../ui/models/blog-article.interface';
 
 export interface ArticleDetailsServiceInterface {
     getArticleDetails(articleId: string): Observable<ArticleDetailsResult>;
@@ -9,18 +12,17 @@ export interface ArticleDetailsServiceInterface {
         commentData: CommentFormValue
     ): Observable<ArticleDetailsResult>;
 
-    updateArticleRating(
-        articleId: string,
-        rating: number
-    ): Observable<ArticleDetailsResult>;
+    voteArticleUp(articleId: string): Observable<ArticleDetailsResult>;
 
-    toggleCommentLike(
+    voteArticleDown(articleId: string): Observable<ArticleDetailsResult>;
+
+    updateCommentRating(
         articleId: string,
-        commentId: string
+        commentId: string,
+        rating: number
     ): Observable<ArticleDetailsResult>;
 
     getCommentsCount(): Observable<number>;
 
     deleteArticleRelatedData(articleId: string): void;
-
 }

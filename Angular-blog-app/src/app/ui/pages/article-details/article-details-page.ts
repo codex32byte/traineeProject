@@ -1,19 +1,28 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, inject, signal } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    DestroyRef,
+    computed,
+    inject,
+    signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { take } from 'rxjs';
-import { FormControl, FormGroup, FormGroupDirective, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize, take } from 'rxjs';
 
 import { ARTICLE_DETAILS_SERVICE } from '../../../services/article-details/article-details-service.token';
 import { ArticleDetailsStoreService } from '../../../services/article-details/article-details-store.service';
-import { CommentFormValue } from '../../models/blog-article.interface';
-import { ArticleDetailsResult } from '../../models/blog-article.interface';
+import {
+    ArticleDetailsResult,
+    ArticleVote,
+    CommentFormValue,
+} from '../../models/blog-article.interface';
 
-import { MatCardModule } from '@angular/material/card';
+import { ArticleCommentForm } from './components/article-comment-form/article-comment-form';
+
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
@@ -21,31 +30,27 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
     standalone: true,
     imports: [
         RouterModule,
-        ReactiveFormsModule,
+        ArticleCommentForm,
         MatCardModule,
         MatButtonModule,
         MatIconModule,
-        MatFormFieldModule,
-        MatInputModule,
         MatPaginatorModule,
     ],
     templateUrl: './article-details-page.html',
     styleUrl: './article-details-page.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [ArticleDetailsStoreService],
 })
 export class ArticleDetailsPage {
-    private readonly initialLoadDelay = 700;
-
     private readonly route = inject(ActivatedRoute);
     private readonly destroyRef = inject(DestroyRef);
     private readonly articleDetailsService = inject(ARTICLE_DETAILS_SERVICE);
-
-    @ViewChild(FormGroupDirective) private formDirective?: FormGroupDirective;
-
     private readonly articleDetailsStore = inject(ArticleDetailsStoreService);
 
     protected readonly isLoading = signal(true);
-    protected readonly ratingStars = [1, 2, 3, 4, 5];
+    protected readonly isVoting = signal(false);
+    protected readonly isCommentRatingUpdating = signal(false);
+    protected readonly commentRatingStars = [1, 2, 3, 4, 5];
 
     protected readonly commentsPageSize = signal(5);
     protected readonly commentsPageIndex = signal(0);
@@ -62,33 +67,16 @@ export class ArticleDetailsPage {
         return this.comments().slice(startIndex, endIndex);
     });
 
-    protected readonly form = new FormGroup({
-        author: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required],
-        }),
-        text: new FormControl('', {
-            nonNullable: true,
-            validators: [Validators.required],
-        }),
-    });
-
     constructor() {
         this.loadArticleDetails();
     }
 
-    protected addComment(): void {
+    protected addComment(commentData: CommentFormValue): void {
         const article = this.article();
 
-        if (this.form.invalid || !article) {
-            this.form.markAllAsTouched();
+        if (!article) {
             return;
         }
-
-        const commentData: CommentFormValue = {
-            author: this.form.controls.author.value.trim(),
-            text: this.form.controls.text.value.trim(),
-        };
 
         this.articleDetailsService
             .addComment(article.id, commentData)
@@ -96,56 +84,56 @@ export class ArticleDetailsPage {
                 take(1),
                 takeUntilDestroyed(this.destroyRef)
             )
-            .subscribe(response => {
-                this.saveArticleDetailsResult(response);
-
-                const lastPageIndex = Math.max(
-                    Math.ceil(response.comments.length / this.commentsPageSize()) - 1,
-                    0
-                );
-
-                this.commentsPageIndex.set(lastPageIndex);
-
-                this.formDirective?.resetForm({
-                    author: '',
-                    text: '',
-                });
+            .subscribe({
+                next: response => {
+                    this.saveArticleDetailsResult(response);
+                    this.commentsPageIndex.set(0);
+                },
+                error: error => {
+                    console.error('Failed to add comment:', error);
+                },
             });
     }
 
-    protected setArticleRating(rating: number): void {
-        const article = this.article();
-
-        if (!article) {
-            return;
-        }
-
-        this.articleDetailsService
-            .updateArticleRating(article.id, rating)
-            .pipe(
-                take(1),
-                takeUntilDestroyed(this.destroyRef)
-            )
-            .subscribe(response => {
-                this.saveArticleDetailsResult(response);
-            });
+    protected voteArticleUp(): void {
+        this.voteArticle('up');
     }
 
-    protected toggleCommentLike(commentId: string): void {
-        const article = this.article();
+    protected voteArticleDown(): void {
+        this.voteArticle('down');
+    }
 
-        if (!article) {
+    protected updateCommentRating(commentId: string, rating: number): void {
+        const article = this.article();
+        const comment = this.comments().find(comment => comment.id === commentId);
+
+        if (
+            !article ||
+            !comment ||
+            this.isCommentRatingUpdating() ||
+            comment.rating === rating
+        ) {
             return;
         }
 
+        this.isCommentRatingUpdating.set(true);
+
         this.articleDetailsService
-            .toggleCommentLike(article.id, commentId)
+            .updateCommentRating(article.id, commentId, rating)
             .pipe(
                 take(1),
+                finalize(() => {
+                    this.isCommentRatingUpdating.set(false);
+                }),
                 takeUntilDestroyed(this.destroyRef)
             )
-            .subscribe(response => {
-                this.saveArticleDetailsResult(response);
+            .subscribe({
+                next: response => {
+                    this.saveArticleDetailsResult(response);
+                },
+                error: error => {
+                    console.error('Failed to update comment rating:', error);
+                },
             });
     }
 
@@ -154,11 +142,51 @@ export class ArticleDetailsPage {
         this.commentsPageSize.set(event.pageSize);
     }
 
-    protected isArticleStarFilled(star: number): boolean {
-        return star <= (this.articleRating()?.currentUserRating ?? 0);
+    protected isArticleVotedUp(): boolean {
+        return this.articleRating()?.currentUserVote === 'up';
     }
 
-    private async loadArticleDetails(): Promise<void> {
+    protected isArticleVotedDown(): boolean {
+        return this.articleRating()?.currentUserVote === 'down';
+    }
+
+    protected isCommentStarFilled(commentRating: number, star: number): boolean {
+        return star <= commentRating;
+    }
+
+    private voteArticle(vote: ArticleVote): void {
+        const article = this.article();
+        const articleRating = this.articleRating();
+
+        if (!article || this.isVoting() || articleRating?.currentUserVote === vote) {
+            return;
+        }
+
+        this.isVoting.set(true);
+
+        const voteRequest = vote === 'up'
+            ? this.articleDetailsService.voteArticleUp(article.id)
+            : this.articleDetailsService.voteArticleDown(article.id);
+
+        voteRequest
+            .pipe(
+                take(1),
+                finalize(() => {
+                    this.isVoting.set(false);
+                }),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe({
+                next: response => {
+                    this.saveArticleDetailsResult(response);
+                },
+                error: error => {
+                    console.error('Failed to update article vote:', error);
+                },
+            });
+    }
+
+    private loadArticleDetails(): void {
         const articleId = this.route.snapshot.paramMap.get('id');
 
         if (!articleId) {
@@ -168,18 +196,22 @@ export class ArticleDetailsPage {
 
         this.isLoading.set(true);
 
-        await this.wait(this.initialLoadDelay);
-
         this.articleDetailsService
             .getArticleDetails(articleId)
             .pipe(
                 take(1),
                 takeUntilDestroyed(this.destroyRef)
             )
-            .subscribe(response => {
-                this.saveArticleDetailsResult(response);
-                this.commentsPageIndex.set(0);
-                this.isLoading.set(false);
+            .subscribe({
+                next: response => {
+                    this.saveArticleDetailsResult(response);
+                    this.commentsPageIndex.set(0);
+                    this.isLoading.set(false);
+                },
+                error: error => {
+                    console.error('Failed to load article details:', error);
+                    this.isLoading.set(false);
+                },
             });
     }
 
@@ -189,9 +221,5 @@ export class ArticleDetailsPage {
             response.comments,
             response.articleRating
         );
-    }
-
-    private wait(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }

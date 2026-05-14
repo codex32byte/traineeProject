@@ -1,9 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { ArticleComment, ArticleRating, BlogArticle, } from '../../ui/models/blog-article.interface';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class ArticleDetailsStoreService {
     public readonly article = signal<BlogArticle | null>(null);
     public readonly comments = signal<ArticleComment[]>([]);

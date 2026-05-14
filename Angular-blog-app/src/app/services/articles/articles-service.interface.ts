@@ -1,13 +1,17 @@
 import { Observable } from 'rxjs';
 import {
-    BlogArticle,
     ArticlesPageResult,
     ArticlesPaginationParams,
+    BlogArticle,
     BlogArticleFormValue,
 } from '../../ui/models/blog-article.interface';
 
 export interface ArticlesServiceInterface {
     getArticles(params: ArticlesPaginationParams): Observable<ArticlesPageResult>;
+
+    getArticleById(id: string): Observable<BlogArticle | null>;
+
+    getLatestArticles(limit: number): Observable<BlogArticle[]>;
 
     addArticle(
         articleData: BlogArticleFormValue,
@@ -25,7 +29,7 @@ export interface ArticlesServiceInterface {
         params: ArticlesPaginationParams
     ): Observable<ArticlesPageResult>;
 
-    getArticlesFromStorage(): BlogArticle[];
+    voteArticleUp(id: string): Observable<BlogArticle | null>;
+
+    voteArticleDown(id: string): Observable<BlogArticle | null>;
 }
-
-

@@ -10,6 +10,16 @@
   padding-right: 140px;
 }
 
+.blog-error-message {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background-color: #fff1f1;
+  color: #c62828;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 @media (max-width: 1024px) {
   .blog-page .page-shell {
     padding-right: 28px;

@@ -5,11 +5,15 @@ export interface BlogArticle {
     date: string;
     image: string;
     rating?: number;
+    categoryId?: string | null;
 }
 
 export interface BlogArticleFormValue {
     title: string;
     content: string;
+    imageFile?: File | null;
+    categoryId?: string | null;
+    categoryName?: string | null;
 }
 
 export interface ArticlesPaginationParams {
@@ -28,14 +32,13 @@ export interface MinLengthValidationInfo {
     actualLength: number;
 }
 
-
 //blog page details
+export type ArticleVote = 'up' | 'down';
 
 export interface ArticleRating {
     articleId: string;
-    average: number;
-    votesCount: number;
-    currentUserRating: number | null;
+    score: number;
+    currentUserVote: ArticleVote | null;
 }
 
 export interface ArticleComment {
@@ -43,8 +46,7 @@ export interface ArticleComment {
     author: string;
     text: string;
     date: string;
-    likesCount: number;
-    isLikedByCurrentUser: boolean;
+    rating: number;
 }
 
 export interface ArticleDetailsResult {
@@ -56,4 +58,5 @@ export interface ArticleDetailsResult {
 export interface CommentFormValue {
     author: string;
     text: string;
+    rating: number;
 }

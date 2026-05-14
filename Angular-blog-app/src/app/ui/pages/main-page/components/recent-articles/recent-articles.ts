@@ -1,53 +1,49 @@
-import { Component, inject, computed, DestroyRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
+import { take } from 'rxjs';
+
 import { ARTICLES_SERVICE } from '../../../../../services/articles/articles-service.token';
 import { ArticlesStoreService } from '../../../../../services/articles/articles-store.service';
-import { take } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-recent-articles',
   templateUrl: './recent-articles.html',
   styleUrl: './recent-articles.scss',
   imports: [RouterModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecentArticles {
-  private readonly postsPerPage = 7;
+  private readonly latestArticlesLimit = 2;
 
   private readonly articlesService = inject(ARTICLES_SERVICE);
   private readonly destroyRef = inject(DestroyRef);
+
   protected readonly articlesStore = inject(ArticlesStoreService);
-
-
-  protected readonly latestArticles = computed(() => {
-    // Use getArticlesFromStorage from ArticlesService to load articles
-    const allArticles = this.articlesService.getArticlesFromStorage();
-    return allArticles.slice(-2).reverse();
-  });
+  protected readonly latestArticles = this.articlesStore.latestArticles;
 
   constructor() {
-    this.loadArticlesIfStoreIsEmpty();
+    this.loadLatestArticlesIfStoreIsEmpty();
   }
 
-  // Function to load articles if store is empty
-  private loadArticlesIfStoreIsEmpty(): void {
-    if (this.articlesStore.articles().length) {
+  private loadLatestArticlesIfStoreIsEmpty(): void {
+    if (this.latestArticles().length) {
       return;
     }
 
-    // If no articles in the store, fetch them and save to store
     this.articlesService
-      .getArticles({
-        page: this.articlesStore.activePage(),
-        limit: this.postsPerPage,
-      })
+      .getLatestArticles(this.latestArticlesLimit)
       .pipe(
         take(1),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(response => {
-        // Save articles and total items with the correct arguments
-        this.articlesStore.saveArticles(response.items, response.totalItems);
+      .subscribe(articles => {
+        this.articlesStore.saveLatestArticles(articles);
       });
   }
 }

@@ -122,6 +122,16 @@
   color: var(--text-main);
 }
 
+.selected-file-name {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.category-field {
+  width: 100%;
+}
 @media (max-width: 480px) {
   .article-dialog-body {
     padding: 26px 18px 20px;
