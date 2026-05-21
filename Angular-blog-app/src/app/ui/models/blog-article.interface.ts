@@ -32,7 +32,7 @@ export interface MinLengthValidationInfo {
     actualLength: number;
 }
 
-//blog page details
+// blog page details
 export type ArticleVote = 'up' | 'down';
 
 export interface ArticleRating {
@@ -58,5 +58,4 @@ export interface ArticleDetailsResult {
 export interface CommentFormValue {
     author: string;
     text: string;
-    rating: number;
 }

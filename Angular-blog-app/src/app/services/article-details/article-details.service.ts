@@ -1,8 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
 import {
     ArticleComment,
     ArticleDetailsResult,
@@ -14,44 +12,29 @@ import {
 import { ARTICLES_SERVICE } from '../articles/articles-service.token';
 import { ArticleDetailsServiceInterface } from './article-details-service.interface';
 
-interface BackendComment {
-    id: string;
-    username: string;
-    content: string;
-    articleId: string;
-    rating?: number;
-    createdAt: string;
-    updatedAt?: string;
-}
-
 @Injectable()
 export class ArticleDetailsService implements ArticleDetailsServiceInterface {
     private readonly commentsStorageKey = 'articleComments';
     private readonly articleVotesStorageKey = 'articleVotes';
 
-    private readonly http = inject(HttpClient);
     private readonly articlesService = inject(ARTICLES_SERVICE);
-
-    private readonly commentsApiUrl = `${environment.apiUrl}/comments`;
 
     public getArticleDetails(articleId: string): Observable<ArticleDetailsResult> {
         return this.articlesService.getArticleById(articleId).pipe(
-            switchMap(article => {
+            map(article => {
                 if (!article) {
-                    return of({
+                    return {
                         article: null,
                         comments: [],
                         articleRating: null,
-                    });
+                    };
                 }
 
-                return this.getCommentsByArticleId(articleId).pipe(
-                    map(comments => ({
-                        article,
-                        comments,
-                        articleRating: this.getArticleRating(article),
-                    }))
-                );
+                return {
+                    article,
+                    comments: this.getLocalCommentsByArticleId(articleId),
+                    articleRating: this.getArticleRating(article),
+                };
             })
         );
     }
@@ -60,31 +43,13 @@ export class ArticleDetailsService implements ArticleDetailsServiceInterface {
         articleId: string,
         commentData: CommentFormValue
     ): Observable<ArticleDetailsResult> {
-        if (environment.useBackendApi) {
-            return this.http
-                .post<BackendComment>(this.commentsApiUrl, {
-                    username: commentData.author,
-                    content: commentData.text,
-                    articleId,
-                })
-                .pipe(
-                    switchMap(comment =>
-                        this.updateBackendCommentRating(
-                            comment.id,
-                            this.normalizeRequiredCommentRating(commentData.rating)
-                        )
-                    ),
-                    switchMap(() => this.getArticleDetails(articleId))
-                );
-        }
-
         const commentsMap = this.getCommentsMap();
 
         const newComment: ArticleComment = {
             id: crypto.randomUUID(),
             author: commentData.author,
             text: commentData.text,
-            rating: this.normalizeRequiredCommentRating(commentData.rating),
+            rating: 0,
             date: new Date().toLocaleDateString('en-US', {
                 month: 'long',
                 day: 'numeric',
@@ -127,74 +92,51 @@ export class ArticleDetailsService implements ArticleDetailsServiceInterface {
             switchMap(() => this.getArticleDetails(articleId))
         );
     }
+
     public updateCommentRating(
         articleId: string,
         commentId: string,
         rating: number
-    ): Observable<ArticleDetailsResult> {
+    ): Observable<ArticleComment> {
         const normalizedRating = this.normalizeRequiredCommentRating(rating);
+        const commentsMap = this.getCommentsMap();
+        const articleComments = commentsMap[articleId] ?? [];
 
-        if (environment.useBackendApi) {
-            return this.updateBackendCommentRating(commentId, normalizedRating).pipe(
-                switchMap(() => this.getArticleDetails(articleId))
-            );
+        const existingComment = articleComments.find(comment => {
+            return comment.id === commentId;
+        });
+
+        if (!existingComment) {
+            return throwError(() => new Error('Comment not found'));
         }
 
-        const commentsMap = this.getCommentsMap();
+        const updatedComment: ArticleComment = {
+            ...existingComment,
+            rating: normalizedRating,
+        };
 
-        commentsMap[articleId] = (commentsMap[articleId] ?? []).map(comment => {
+        commentsMap[articleId] = articleComments.map(comment => {
             if (comment.id !== commentId) {
                 return comment;
             }
 
-            return {
-                ...comment,
-                rating: normalizedRating,
-            };
+            return updatedComment;
         });
 
         this.saveCommentsMap(commentsMap);
 
-        return this.getArticleDetails(articleId);
+        return of(updatedComment);
     }
 
     public getCommentsCount(): Observable<number> {
-        if (!environment.useBackendApi) {
-            const commentsMap = this.getCommentsMap();
+        const commentsMap = this.getCommentsMap();
 
-            const commentsCount = Object.values(commentsMap).reduce(
-                (total, comments) => total + comments.length,
-                0
-            );
+        const commentsCount = Object.values(commentsMap).reduce(
+            (total, comments) => total + comments.length,
+            0
+        );
 
-            return of(commentsCount);
-        }
-
-        return this.articlesService
-            .getArticles({
-                page: 1,
-                limit: Number.MAX_SAFE_INTEGER,
-            })
-            .pipe(
-                switchMap(response => {
-                    if (!response.allItems.length) {
-                        return of(0);
-                    }
-
-                    return forkJoin(
-                        response.allItems.map(article =>
-                            this.getBackendCommentsByArticleId(article.id)
-                        )
-                    ).pipe(
-                        map(commentsGroups =>
-                            commentsGroups.reduce(
-                                (total, comments) => total + comments.length,
-                                0
-                            )
-                        )
-                    );
-                })
-            );
+        return of(commentsCount);
     }
 
     public deleteArticleRelatedData(articleId: string): void {
@@ -206,36 +148,6 @@ export class ArticleDetailsService implements ArticleDetailsServiceInterface {
 
         this.saveCommentsMap(commentsMap);
         this.saveArticleVotesMap(votesMap);
-    }
-
-    private getCommentsByArticleId(articleId: string): Observable<ArticleComment[]> {
-        if (environment.useBackendApi) {
-            return this.getBackendCommentsByArticleId(articleId);
-        }
-
-        return of(this.getLocalCommentsByArticleId(articleId));
-    }
-
-    private getBackendCommentsByArticleId(articleId: string): Observable<ArticleComment[]> {
-        return this.http
-            .get<BackendComment[]>(`${this.commentsApiUrl}/article/${articleId}`)
-            .pipe(
-                map(comments =>
-                    comments.map(comment => this.mapBackendComment(comment))
-                )
-            );
-    }
-
-    private updateBackendCommentRating(
-        commentId: string,
-        rating: number
-    ): Observable<BackendComment> {
-        return this.http.patch<BackendComment>(
-            `${this.commentsApiUrl}/${commentId}/rating`,
-            {
-                rating,
-            }
-        );
     }
 
     private getLocalCommentsByArticleId(articleId: string): ArticleComment[] {
@@ -272,20 +184,6 @@ export class ArticleDetailsService implements ArticleDetailsServiceInterface {
         votesMap[articleId] = vote;
 
         this.saveArticleVotesMap(votesMap);
-    }
-
-    private mapBackendComment(comment: BackendComment): ArticleComment {
-        return {
-            id: comment.id,
-            author: comment.username,
-            text: comment.content,
-            rating: this.normalizeCommentRating(comment.rating),
-            date: new Date(comment.createdAt).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-            }),
-        };
     }
 
     private getCommentsMap(): Record<string, ArticleComment[]> {

@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import {
+    ArticleComment,
     ArticleDetailsResult,
     CommentFormValue,
 } from '../../ui/models/blog-article.interface';
@@ -20,7 +21,7 @@ export interface ArticleDetailsServiceInterface {
         articleId: string,
         commentId: string,
         rating: number
-    ): Observable<ArticleDetailsResult>;
+    ): Observable<ArticleComment>;
 
     getCommentsCount(): Observable<number>;
 

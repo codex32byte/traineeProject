@@ -40,8 +40,6 @@ export class ArticleCommentForm {
 
     @ViewChild(FormGroupDirective) private formDirective?: FormGroupDirective;
 
-    protected readonly ratingStars = [1, 2, 3, 4, 5];
-
     protected readonly form = new FormGroup({
         author: new FormControl('', {
             nonNullable: true,
@@ -51,25 +49,15 @@ export class ArticleCommentForm {
             nonNullable: true,
             validators: [Validators.required],
         }),
-        rating: new FormControl(0, {
-            nonNullable: true,
-            validators: [Validators.required, Validators.min(1), Validators.max(5)],
-        }),
     });
 
     protected submitComment(): void {
         const commentData: CommentFormValue = {
             author: this.form.controls.author.value.trim(),
             text: this.form.controls.text.value.trim(),
-            rating: this.form.controls.rating.value,
         };
 
-        if (
-            this.form.invalid ||
-            !commentData.author ||
-            !commentData.text ||
-            !commentData.rating
-        ) {
+        if (this.form.invalid || !commentData.author || !commentData.text) {
             this.form.markAllAsTouched();
             return;
         }
@@ -79,22 +67,6 @@ export class ArticleCommentForm {
         this.formDirective?.resetForm({
             author: '',
             text: '',
-            rating: 0,
         });
-    }
-
-    protected setRating(rating: number): void {
-        this.form.controls.rating.setValue(rating);
-        this.form.controls.rating.markAsTouched();
-    }
-
-    protected isRatingStarFilled(star: number): boolean {
-        return star <= this.form.controls.rating.value;
-    }
-
-    protected hasRatingError(): boolean {
-        const control = this.form.controls.rating;
-
-        return control.invalid && control.touched;
     }
 }

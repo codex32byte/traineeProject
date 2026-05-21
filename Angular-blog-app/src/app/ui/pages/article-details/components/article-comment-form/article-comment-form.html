@@ -28,30 +28,6 @@
             }
         </mat-form-field>
 
-        <div class="article-comment-rating-field">
-            <p class="article-comment-rating-field__label">
-                Comment rating <span class="required-mark">*</span>
-            </p>
-
-            <div class="article-comment-rating-stars" aria-label="Rate your comment">
-                @for (star of ratingStars; track star) {
-                <button type="button" class="article-comment-rating-stars__button"
-                    [class.article-comment-rating-stars__button_active]="isRatingStarFilled(star)"
-                    [attr.aria-label]="'Rate comment ' + star + ' stars'" (click)="setRating(star)">
-                    <mat-icon>
-                        {{ isRatingStarFilled(star) ? 'star' : 'star_border' }}
-                    </mat-icon>
-                </button>
-                }
-            </div>
-
-            @if (hasRatingError()) {
-            <span class="article-comment-rating-field__error">
-                Rating is required
-            </span>
-            }
-        </div>
-
         <button mat-raised-button color="primary" type="submit" class="article-comment-form-card__submit"
             [disabled]="form.invalid">
             <mat-icon>add_comment</mat-icon>
