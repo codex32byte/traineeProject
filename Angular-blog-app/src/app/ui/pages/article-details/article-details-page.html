@@ -125,21 +125,32 @@
                     </mat-card-content>
 
                     <mat-card-actions class="article-comment-card__actions">
-                        <div class="article-comment-card__rating" aria-label="Comment rating">
-                            @for (star of commentRatingStars; track star) {
-                            <button type="button" class="article-comment-card__rating-button"
-                                [class.article-comment-card__rating-button_active]="isCommentStarFilled(comment.rating, star)"
-                                [disabled]="isCommentRatingUpdating()"
-                                [attr.aria-label]="'Rate comment ' + star + ' stars'"
-                                (click)="updateCommentRating(comment.id, star)">
-                                <mat-icon>
-                                    {{ isCommentStarFilled(comment.rating, star) ? 'star' : 'star_border' }}
-                                </mat-icon>
-                            </button>
-                            }
+                        <div class="article-comment-card__rating-control" aria-label="Comment rating">
+                            <span class="article-comment-card__rating-label">
+                                Rating
+                            </span>
+
+                            <div class="article-comment-card__rating-stars"
+                                [attr.aria-label]="'Comment rating ' + formatCommentRating(comment.rating) + ' out of 5'"
+                                (mouseleave)="clearCommentRatingPreview(comment.id)"
+                                (focusout)="clearCommentRatingPreviewOnFocusOut(comment.id, $event)">
+                                @for (star of commentRatingStars; track star) {
+                                <button type="button" class="article-comment-card__rating-button"
+                                    [class.article-comment-card__rating-button_active]="isCommentStarActive(comment.id, comment.rating, star)"
+                                    [disabled]="isCommentRatingUpdating(comment.id)"
+                                    [attr.aria-label]="'Rate comment ' + star + ' stars'"
+                                    (mouseenter)="setCommentRatingPreview(comment.id, star)"
+                                    (focus)="setCommentRatingPreview(comment.id, star)"
+                                    (click)="updateCommentRating(comment.id, star)">
+                                    <mat-icon>
+                                        {{ getCommentStarIcon(comment.id, comment.rating, star) }}
+                                    </mat-icon>
+                                </button>
+                                }
+                            </div>
 
                             <span class="article-comment-card__rating-value">
-                                {{ comment.rating }} / 5
+                                {{ formatCommentRating(comment.rating) }} / 5
                             </span>
                         </div>
                     </mat-card-actions>

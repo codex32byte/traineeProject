@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 28px;
+  min-width: 0;
 }
 
 .article-page__toolbar {
@@ -49,6 +50,8 @@
 /* Main article */
 .article-post-card {
   display: block;
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
   border-radius: 28px;
   border: 1px solid rgba(53, 56, 74, 0.08);
@@ -79,12 +82,17 @@
 
 /* Article text area */
 .article-post-content {
+  width: 100%;
   max-width: 780px;
+  min-width: 0;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 48px 32px 52px;
 }
 
 .article-post-header {
+  max-width: 100%;
+  min-width: 0;
   margin-bottom: 28px;
 }
 
@@ -93,6 +101,8 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  max-width: 100%;
+  min-width: 0;
   margin-bottom: 20px;
 }
 
@@ -117,6 +127,7 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  max-width: 100%;
   padding: 6px 10px;
   border-radius: 999px;
   background-color: var(--surface-green);
@@ -146,24 +157,38 @@
 }
 
 .article-post-header__title {
+  max-width: 100%;
   margin: 0;
   color: var(--text-main);
   font-size: clamp(38px, 5vw, 62px);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
 }
 
 .article-post-body {
+  max-width: 100%;
+  min-width: 0;
   color: var(--text-muted);
   font-size: 18px;
   line-height: 1.78;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: normal;
 }
 
 .article-post-body p {
+  max-width: 100%;
   margin: 0;
   white-space: pre-line;
   overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
 }
 
 /* Article vote actions */
@@ -238,9 +263,11 @@
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 28px;
   align-items: flex-start;
+  min-width: 0;
 }
 
 .article-comments-card {
+  min-width: 0;
   padding: 26px;
   border-radius: 24px;
   border: 1px solid rgba(53, 56, 74, 0.08);
@@ -302,6 +329,7 @@
 
 /* Mat-card comments */
 .article-comment-card {
+  min-width: 0;
   border-radius: 18px;
   box-shadow: none;
   border: 1px solid rgba(53, 56, 74, 0.08);
@@ -318,11 +346,16 @@
 }
 
 .article-comment-card__text {
+  max-width: 100%;
   margin: 12px 0 0;
   color: var(--text-muted);
   line-height: 1.65;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: normal;
 }
 
+/* Comment rating */
 .article-comment-card__actions {
   display: flex;
   align-items: center;
@@ -331,21 +364,37 @@
   flex-wrap: wrap;
 }
 
-/* Comment rating */
-.article-comment-card__rating {
+.article-comment-card__rating-control {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 7px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: rgba(87, 196, 92, 0.1);
+  border: 1px solid rgba(87, 196, 92, 0.2);
   flex-wrap: wrap;
 }
 
+.article-comment-card__rating-label {
+  color: var(--accent-green);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.article-comment-card__rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
 .article-comment-card__rating-button {
-  width: 32px;
-  height: 32px;
+  width: 25px;
+  height: 25px;
   border: none;
   border-radius: 999px;
   background-color: transparent;
-  color: #c4cad5;
+  color: rgba(87, 196, 92, 0.28);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -359,17 +408,17 @@
 
 .article-comment-card__rating-button mat-icon {
   color: inherit;
-  font-size: 22px;
-  width: 22px;
-  height: 22px;
-  line-height: 22px;
+  font-size: 19px;
+  width: 19px;
+  height: 19px;
+  line-height: 19px;
 }
 
 .article-comment-card__rating-button:hover,
-.article-comment-card__rating-button:focus {
+.article-comment-card__rating-button:focus-visible {
   color: var(--accent-green);
   background-color: rgba(87, 196, 92, 0.12);
-  transform: scale(1.08);
+  transform: translateY(-1px) scale(1.05);
 }
 
 .article-comment-card__rating-button_active {
@@ -383,24 +432,23 @@
 }
 
 .article-comment-card__rating-button:disabled:hover,
-.article-comment-card__rating-button:disabled:focus {
-  color: #c4cad5;
+.article-comment-card__rating-button:disabled:focus-visible {
+  color: rgba(87, 196, 92, 0.28);
   background-color: transparent;
   transform: none;
 }
 
 .article-comment-card__rating-button_active:disabled,
 .article-comment-card__rating-button_active:disabled:hover,
-.article-comment-card__rating-button_active:disabled:focus {
+.article-comment-card__rating-button_active:disabled:focus-visible {
   color: var(--accent-green);
-  background-color: rgba(87, 196, 92, 0.12);
+  background-color: rgba(87, 196, 92, 0.08);
 }
 
 .article-comment-card__rating-value {
-  margin-left: 6px;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 700;
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .article-comments-empty {
@@ -527,6 +575,7 @@
   }
 
   .article-post-content {
+    max-width: 100%;
     padding: 40px 22px 44px;
   }
 
@@ -563,6 +612,7 @@
   }
 
   .article-post-content {
+    max-width: 100%;
     padding: 32px 18px 36px;
   }
 
@@ -600,5 +650,10 @@
   .article-comment-card__actions {
     align-items: flex-start;
     flex-direction: column;
+    gap: 8px;
+  }
+
+  .article-comment-card__rating-control {
+    width: 100%;
   }
 }

@@ -12,7 +12,15 @@ import { finalize, take } from 'rxjs';
 
 import { ARTICLE_DETAILS_SERVICE } from '../../../services/article-details/article-details-service.token';
 import { ArticleDetailsStoreService } from '../../../services/article-details/article-details-store.service';
+import { ARTICLE_EVENTS_SERVICE } from '../../../services/article-events/article-events-service.token';
 import {
+    ArticleRatingChangedEvent,
+    CommentCreatedEvent,
+    CommentRatingChangedEvent,
+} from '../../../services/article-events/article-events-service.interface';
+
+import {
+    ArticleComment,
     ArticleDetailsResult,
     ArticleVote,
     CommentFormValue,
@@ -45,12 +53,18 @@ export class ArticleDetailsPage {
     private readonly route = inject(ActivatedRoute);
     private readonly destroyRef = inject(DestroyRef);
     private readonly articleDetailsService = inject(ARTICLE_DETAILS_SERVICE);
+    private readonly articleEventsService = inject(ARTICLE_EVENTS_SERVICE);
     private readonly articleDetailsStore = inject(ArticleDetailsStoreService);
 
     protected readonly isLoading = signal(true);
     protected readonly isVoting = signal(false);
-    protected readonly isCommentRatingUpdating = signal(false);
+    protected readonly updatingCommentRatingId = signal<string | null>(null);
     protected readonly commentRatingStars = [1, 2, 3, 4, 5];
+
+    protected readonly commentRatingPreview = signal<{
+        commentId: string;
+        rating: number;
+    } | null>(null);
 
     protected readonly commentsPageSize = signal(5);
     protected readonly commentsPageIndex = signal(0);
@@ -107,29 +121,28 @@ export class ArticleDetailsPage {
         const article = this.article();
         const comment = this.comments().find(comment => comment.id === commentId);
 
-        if (
-            !article ||
-            !comment ||
-            this.isCommentRatingUpdating() ||
-            comment.rating === rating
-        ) {
+        if (!article || !comment || this.updatingCommentRatingId()) {
             return;
         }
 
-        this.isCommentRatingUpdating.set(true);
+        this.updatingCommentRatingId.set(commentId);
 
         this.articleDetailsService
             .updateCommentRating(article.id, commentId, rating)
             .pipe(
                 take(1),
                 finalize(() => {
-                    this.isCommentRatingUpdating.set(false);
+                    this.clearCommentRatingPreview(commentId);
+                    this.updatingCommentRatingId.set(null);
                 }),
                 takeUntilDestroyed(this.destroyRef)
             )
             .subscribe({
-                next: response => {
-                    this.saveArticleDetailsResult(response);
+                next: updatedComment => {
+                    this.updateCommentRatingFromEvent(
+                        updatedComment.id,
+                        updatedComment.rating
+                    );
                 },
                 error: error => {
                     console.error('Failed to update comment rating:', error);
@@ -150,8 +163,83 @@ export class ArticleDetailsPage {
         return this.articleRating()?.currentUserVote === 'down';
     }
 
-    protected isCommentStarFilled(commentRating: number, star: number): boolean {
-        return star <= commentRating;
+    protected isCommentRatingUpdating(commentId: string): boolean {
+        return this.updatingCommentRatingId() === commentId;
+    }
+
+    protected getCommentStarIcon(
+        commentId: string,
+        commentRating: number,
+        star: number
+    ): string {
+        const rating = this.getDisplayedCommentRating(commentId, commentRating);
+
+        if (rating >= star) {
+            return 'star';
+        }
+
+        if (rating >= star - 0.5) {
+            return 'star_half';
+        }
+
+        return 'star_border';
+    }
+
+    protected isCommentStarActive(
+        commentId: string,
+        commentRating: number,
+        star: number
+    ): boolean {
+        return this.getDisplayedCommentRating(commentId, commentRating) >= star - 0.5;
+    }
+
+    protected setCommentRatingPreview(commentId: string, rating: number): void {
+        if (this.updatingCommentRatingId()) {
+            return;
+        }
+
+        this.commentRatingPreview.set({
+            commentId,
+            rating,
+        });
+    }
+
+    protected clearCommentRatingPreview(commentId: string): void {
+        const preview = this.commentRatingPreview();
+
+        if (preview?.commentId !== commentId) {
+            return;
+        }
+
+        this.commentRatingPreview.set(null);
+    }
+
+    protected clearCommentRatingPreviewOnFocusOut(
+        commentId: string,
+        event: FocusEvent
+    ): void {
+        const currentTarget = event.currentTarget as HTMLElement | null;
+        const nextTarget = event.relatedTarget as HTMLElement | null;
+
+        if (currentTarget?.contains(nextTarget)) {
+            return;
+        }
+
+        this.clearCommentRatingPreview(commentId);
+    }
+
+    protected formatCommentRating(rating: number): string {
+        return this.normalizeRatingValue(rating).toFixed(2);
+    }
+
+    private getDisplayedCommentRating(commentId: string, commentRating: number): number {
+        const preview = this.commentRatingPreview();
+
+        if (preview?.commentId === commentId) {
+            return preview.rating;
+        }
+
+        return this.normalizeRatingValue(commentRating);
     }
 
     private voteArticle(vote: ArticleVote): void {
@@ -207,6 +295,10 @@ export class ArticleDetailsPage {
                     this.saveArticleDetailsResult(response);
                     this.commentsPageIndex.set(0);
                     this.isLoading.set(false);
+
+                    if (response.article) {
+                        this.connectArticleEvents(response.article.id);
+                    }
                 },
                 error: error => {
                     console.error('Failed to load article details:', error);
@@ -215,11 +307,167 @@ export class ArticleDetailsPage {
             });
     }
 
+    private connectArticleEvents(articleId: string): void {
+        this.articleEventsService.connect();
+        this.articleEventsService.subscribeArticle(articleId);
+
+        this.destroyRef.onDestroy(() => {
+            this.articleEventsService.unsubscribeArticle(articleId);
+            this.articleEventsService.disconnect();
+        });
+
+        this.articleEventsService.commentCreated$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: event => {
+                    this.handleCommentCreatedEvent(event);
+                },
+                error: error => {
+                    console.error('Comment created websocket error:', error);
+                },
+            });
+
+        this.articleEventsService.commentRatingChanged$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: event => {
+                    this.handleCommentRatingChangedEvent(event);
+                },
+                error: error => {
+                    console.error('Comment rating websocket error:', error);
+                },
+            });
+
+        this.articleEventsService.articleRatingChanged$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: event => {
+                    this.handleArticleRatingChangedEvent(event);
+                },
+                error: error => {
+                    console.error('Article rating websocket error:', error);
+                },
+            });
+    }
+
+    private handleCommentCreatedEvent(event: CommentCreatedEvent): void {
+        const article = this.article();
+
+        if (!article || event.payload.articleId !== article.id) {
+            return;
+        }
+
+        this.addCommentFromEvent({
+            id: event.payload.commentId,
+            author: event.payload.username,
+            text: event.payload.content,
+            rating: 0,
+            date: this.formatDate(event.payload.createdAt),
+        });
+    }
+
+    private handleCommentRatingChangedEvent(
+        event: CommentRatingChangedEvent
+    ): void {
+        const article = this.article();
+
+        if (!article || event.payload.articleId !== article.id) {
+            return;
+        }
+
+        this.updateCommentRatingFromEvent(
+            event.payload.commentId,
+            event.payload.rating
+        );
+    }
+
+    private handleArticleRatingChangedEvent(
+        event: ArticleRatingChangedEvent
+    ): void {
+        const article = this.article();
+
+        if (!article || event.payload.articleId !== article.id) {
+            return;
+        }
+
+        this.updateArticleRatingFromEvent(event.payload.rating);
+    }
+
+    private updateArticleRatingFromEvent(rating: number): void {
+        const article = this.article();
+        const articleRating = this.articleRating();
+
+        if (!article || !articleRating) {
+            return;
+        }
+
+        this.articleDetailsStore.saveArticleDetails(
+            {
+                ...article,
+                rating,
+            },
+            this.comments(),
+            {
+                ...articleRating,
+                score: rating,
+            }
+        );
+    }
+
+    private updateCommentRatingFromEvent(commentId: string, rating: number): void {
+        const updatedComments = this.comments().map(comment => {
+            if (comment.id !== commentId) {
+                return comment;
+            }
+
+            return {
+                ...comment,
+                rating,
+            };
+        });
+
+        this.articleDetailsStore.saveArticleDetails(
+            this.article(),
+            updatedComments,
+            this.articleRating()
+        );
+    }
+
+    private addCommentFromEvent(comment: ArticleComment): void {
+        const isExistingComment = this.comments().some(
+            existingComment => existingComment.id === comment.id
+        );
+
+        if (isExistingComment) {
+            return;
+        }
+
+        this.articleDetailsStore.saveArticleDetails(
+            this.article(),
+            [comment, ...this.comments()],
+            this.articleRating()
+        );
+
+        this.commentsPageIndex.set(0);
+    }
+
     private saveArticleDetailsResult(response: ArticleDetailsResult): void {
         this.articleDetailsStore.saveArticleDetails(
             response.article,
             response.comments,
             response.articleRating
         );
+    }
+
+    private normalizeRatingValue(rating: number): number {
+        return Math.min(Math.max(Number(rating ?? 0), 0), 5);
+    }
+
+    private formatDate(date: Date): string {
+        return date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+        });
     }
 }
