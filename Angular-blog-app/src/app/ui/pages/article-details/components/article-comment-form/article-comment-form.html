@@ -8,6 +8,14 @@
     </h2>
 
     <form [formGroup]="form" (ngSubmit)="submitComment()">
+        @if (isAuthorAutoFilled()) {
+        <div class="comment-author-note">
+            <mat-icon>account_circle</mat-icon>
+            <span>
+                Comment as <strong>{{ currentUsername() }}</strong>
+            </span>
+        </div>
+        } @else {
         <mat-form-field appearance="outline">
             <mat-label>Name</mat-label>
 
@@ -17,6 +25,7 @@
             <mat-error>Name is required</mat-error>
             }
         </mat-form-field>
+        }
 
         <mat-form-field appearance="outline">
             <mat-label>Comment</mat-label>

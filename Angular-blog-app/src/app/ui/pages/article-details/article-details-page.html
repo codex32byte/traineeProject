@@ -176,7 +176,8 @@
             }
         </mat-card>
 
-        <app-article-comment-form (commentSubmit)="addComment($event)"></app-article-comment-form>
+        <app-article-comment-form [currentUsername]="currentUser()?.username ?? null"
+            (commentSubmit)="addComment($event)"></app-article-comment-form>
     </section>
 </main>
 } @else {

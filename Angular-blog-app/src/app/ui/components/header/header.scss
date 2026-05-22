@@ -1,69 +1,187 @@
 .index-header,
 .blog-header {
-    padding-top: 20px;
+  padding-top: 20px;
 }
 
 .navbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 56px;
-    padding: 16px 0;
-    background-color: rgba(245, 245, 242, 0.94);
-    backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 56px;
+  padding: 16px 0;
+  background-color: rgba(245, 245, 242, 0.94);
+  backdrop-filter: blur(10px);
 }
 
 .navbar-logo a {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-dark);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-dark);
 }
 
 .nav-links {
-    display: flex;
-    gap: 36px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-links a {
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--nav-muted);
-    transition: color 0.3s ease, font-weight 0.3s ease;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--nav-muted);
+  transition:
+    color 0.3s ease,
+    font-weight 0.3s ease;
 }
 
 .nav-links a:hover,
 .nav-links a:focus {
-    color: var(--accent-green);
+  color: var(--accent-green);
 }
 
 .nav-links a.active-link {
-    font-weight: 700;
-    color: var(--accent-green);
+  font-weight: 700;
+  color: var(--accent-green);
 }
 
+.auth-nav-item {
+  position: relative;
+}
 
+.auth-login-button,
+.user-menu-button {
+  border: none;
+  background-color: transparent;
+  color: var(--nav-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 16px;
+  transition:
+    color 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.auth-login-button:hover,
+.auth-login-button:focus,
+.user-menu-button:hover,
+.user-menu-button:focus {
+  color: var(--accent-green);
+  background-color: rgba(87, 196, 92, 0.1);
+}
+
+.auth-login-button mat-icon,
+.user-menu-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.user-menu-button {
+  color: var(--accent-green);
+  background-color: var(--surface-green);
+  font-weight: 700;
+}
+
+.user-menu-button__arrow {
+  opacity: 0.75;
+}
+
+.user-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 190px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(87, 196, 92, 0.22);
+  background-color: #ffffff;
+  box-shadow: 0 16px 32px rgba(31, 36, 50, 0.12);
+}
+
+.user-menu__label {
+  margin: 0 0 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.user-menu__name {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.user-menu__role {
+  margin: 4px 0 12px;
+  color: var(--accent-green);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.user-menu__logout {
+  width: 100%;
+  border: none;
+  border-top: 1px solid rgba(53, 56, 74, 0.08);
+  background-color: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  transition: color 0.22s ease;
+}
+
+.user-menu__logout:hover,
+.user-menu__logout:focus {
+  color: var(--accent-green);
+}
+
+.user-menu__logout mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+}
 
 @media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 18px;
-    }
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
 
-    .nav-links {
-        gap: 18px;
-        flex-wrap: wrap;
-    }
+  .nav-links {
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .user-menu {
+    left: 0;
+    right: auto;
+  }
 }
 
 @media (max-width: 480px) {
-    .navbar-logo a {
-        font-size: 24px;
-    }
+  .navbar-logo a {
+    font-size: 24px;
+  }
+
+  .nav-links {
+    width: 100%;
+  }
 }

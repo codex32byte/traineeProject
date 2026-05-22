@@ -43,6 +43,30 @@
   margin-right: 6px;
 }
 
+.comment-author-note {
+  min-height: 46px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background-color: var(--surface-green);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.comment-author-note mat-icon {
+  color: var(--accent-green);
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+}
+
+.comment-author-note strong {
+  color: var(--accent-green);
+}
+
 @media (max-width: 1100px) {
   :host {
     position: static;

@@ -1,15 +1,12 @@
 <section class="blog-section">
     <h1 class="blog-title">My blogs</h1>
 
-    <!-- blog introduction -->
     <p class="blog-intro">
         An overview Articles of NFT concepts, digital ownership,
         and NFT use cases in user and business-oriented services.
     </p>
 
     @if (isLoading) {
-
-    <!-- loader -->
     <div class="blog-loader">
         <div class="blog-loader-dots" aria-label="Loading posts">
             <span></span>
@@ -19,17 +16,14 @@
     </div>
     } @else {
     @if (articles.length === 0) {
-    <!-- empty state -->
     <div class="empty-posts-message">
         <p>Нет статей</p>
     </div>
     } @else {
-
-    <!-- articles list -->
     <div class="blog-cards">
         @for (article of articles; track article.id; let i = $index) {
         <article class="blog-card" [class.blog-card-featured]="i === 0" [routerLink]="['/blog', article.id]">
-            <div class="article-actions">
+            <div class="article-actions" *appHasRole="'admin'">
                 <button type="button" class="edit-post-btn" aria-label="Редактировать статью"
                     (click)="$event.stopPropagation(); editArticle.emit(article)">
                     <mat-icon>edit</mat-icon>
@@ -68,8 +62,6 @@
     </div>
 
     @if (totalPages > 1) {
-
-    <!-- pagination -->
     <div class="pagination">
         <button type="button" class="pagination-btn" (click)="previousPage.emit()"
             [disabled]="isLoading || currentPage === 1">

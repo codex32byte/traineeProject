@@ -13,6 +13,7 @@ import { finalize, take } from 'rxjs';
 import { ARTICLE_DETAILS_SERVICE } from '../../../services/article-details/article-details-service.token';
 import { ArticleDetailsStoreService } from '../../../services/article-details/article-details-store.service';
 import { ARTICLE_EVENTS_SERVICE } from '../../../services/article-events/article-events-service.token';
+import { AUTH_SERVICE } from '../../../services/auth/auth-service.token';
 import {
     ArticleRatingChangedEvent,
     CommentCreatedEvent,
@@ -54,7 +55,10 @@ export class ArticleDetailsPage {
     private readonly destroyRef = inject(DestroyRef);
     private readonly articleDetailsService = inject(ARTICLE_DETAILS_SERVICE);
     private readonly articleEventsService = inject(ARTICLE_EVENTS_SERVICE);
+    private readonly authService = inject(AUTH_SERVICE);
     private readonly articleDetailsStore = inject(ArticleDetailsStoreService);
+
+    protected readonly currentUser = this.authService.currentUser;
 
     protected readonly isLoading = signal(true);
     protected readonly isVoting = signal(false);

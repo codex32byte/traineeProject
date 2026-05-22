@@ -1,6 +1,7 @@
 <div class="page-shell blog-page">
     <div class="blog-page-layout">
-        <app-blog-admin-panel [isLoading]="isLoading()" (openForm)="openForm()" (toggleStats)="toggleStats()" />
+        <app-blog-admin-panel *appHasRole="'admin'" [isLoading]="isLoading()" (openForm)="openForm()"
+            (toggleStats)="toggleStats()"></app-blog-admin-panel>
 
         <main class="blog-main-content">
             @if (requestError()) {

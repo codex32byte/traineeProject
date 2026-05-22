@@ -4,6 +4,9 @@ import {
     EventEmitter,
     Output,
     ViewChild,
+    computed,
+    effect,
+    input,
 } from '@angular/core';
 import {
     FormControl,
@@ -36,9 +39,15 @@ import { MatInputModule } from '@angular/material/input';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleCommentForm {
+    public readonly currentUsername = input<string | null>(null);
+
     @Output() public readonly commentSubmit = new EventEmitter<CommentFormValue>();
 
     @ViewChild(FormGroupDirective) private formDirective?: FormGroupDirective;
+
+    protected readonly isAuthorAutoFilled = computed<boolean>(() => {
+        return Boolean(this.currentUsername()?.trim());
+    });
 
     protected readonly form = new FormGroup({
         author: new FormControl('', {
@@ -51,9 +60,34 @@ export class ArticleCommentForm {
         }),
     });
 
+    constructor() {
+        effect(() => {
+            const username = this.currentUsername()?.trim() ?? '';
+
+            if (username) {
+                this.form.controls.author.setValue(username, {
+                    emitEvent: false,
+                });
+                this.form.controls.author.clearValidators();
+            } else {
+                this.form.controls.author.setValue('', {
+                    emitEvent: false,
+                });
+                this.form.controls.author.setValidators([Validators.required]);
+            }
+
+            this.form.controls.author.updateValueAndValidity({
+                emitEvent: false,
+            });
+        });
+    }
+
     protected submitComment(): void {
+        const author = this.currentUsername()?.trim() ||
+            this.form.controls.author.value.trim();
+
         const commentData: CommentFormValue = {
-            author: this.form.controls.author.value.trim(),
+            author,
             text: this.form.controls.text.value.trim(),
         };
 
@@ -65,7 +99,7 @@ export class ArticleCommentForm {
         this.commentSubmit.emit(commentData);
 
         this.formDirective?.resetForm({
-            author: '',
+            author: this.currentUsername()?.trim() ?? '',
             text: '',
         });
     }

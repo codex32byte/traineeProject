@@ -3,7 +3,7 @@ import {
   inject,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import { provideApollo } from 'apollo-angular';
@@ -29,10 +29,15 @@ import { ARTICLE_EVENTS_SERVICE } from './services/article-events/article-events
 import { ArticleEventsSocketIoService } from './services/article-events/article-events-socket-io.service';
 import { ArticleEventsNoopService } from './services/article-events/article-events-noop.service';
 
+import { AUTH_SERVICE } from './services/auth/auth-service.token';
+import { AuthApiService } from './services/auth/auth-api.service';
+import { AuthService } from './services/auth/auth.service';
+import { authTokenInterceptor } from './interceptors/auth-token.interceptor';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authTokenInterceptor])),
 
     provideApollo(() => {
       const httpLink = inject(HttpLink);
@@ -71,6 +76,10 @@ export const appConfig: ApplicationConfig = {
       useClass: environment.useBackendApi && environment.useWebSocket
         ? ArticleEventsSocketIoService
         : ArticleEventsNoopService,
+    },
+    {
+      provide: AUTH_SERVICE,
+      useClass: environment.useBackendApi ? AuthApiService : AuthService,
     },
   ],
 };

@@ -1,0 +1,114 @@
+:host {
+  display: block;
+}
+
+.auth-dialog {
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, 430px);
+  padding: 30px 28px 22px;
+  border-radius: 22px;
+  background-color: #ffffff;
+}
+
+.auth-dialog__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  color: var(--text-muted);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.22s ease,
+    background-color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.auth-dialog__close mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+}
+
+.auth-dialog__close:hover,
+.auth-dialog__close:focus-visible {
+  color: var(--accent-green);
+  background-color: rgba(87, 196, 92, 0.12);
+  transform: scale(1.05);
+}
+
+.auth-dialog__title {
+  margin: 0 0 18px;
+  padding: 4px 44px 0;
+  color: var(--text-main);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.auth-dialog__content {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.auth-dialog__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-dialog__submit {
+  min-height: 44px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.auth-dialog__submit mat-icon {
+  margin-right: 6px;
+}
+
+.auth-dialog__error {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background-color: rgba(220, 53, 69, 0.08);
+  color: #c62828;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.auth-dialog__actions {
+  min-height: auto;
+  margin: 18px 0 0;
+  padding: 0;
+}
+
+.auth-dialog__actions button {
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+@media (max-width: 480px) {
+  .auth-dialog {
+    width: 100%;
+    padding: 28px 18px 20px;
+  }
+
+  .auth-dialog__title {
+    padding: 6px 42px 0;
+    font-size: 28px;
+  }
+
+  .auth-dialog__submit {
+    width: 100%;
+  }
+}
