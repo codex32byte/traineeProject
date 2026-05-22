@@ -10,10 +10,11 @@ import { ARTICLES_SERVICE } from '../../../services/articles/articles-service.to
 import { ARTICLE_DETAILS_SERVICE } from '../../../services/article-details/article-details-service.token';
 import { CATEGORIES_SERVICE } from '../../../services/categories/categories-service.token';
 import { ArticlesStoreService } from '../../../services/articles/articles-store.service';
+import { HasRoleDirective } from '../../../shared/directives/has-role.directive';
 
 @Component({
   selector: 'app-blog-page',
-  imports: [ArticleForm, BlogAdminPanel, BlogArticlesSection, BlogStatsModal],
+  imports: [ArticleForm, BlogAdminPanel, BlogArticlesSection, BlogStatsModal, HasRoleDirective],
   templateUrl: './blog-page.html',
   styleUrl: './blog-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

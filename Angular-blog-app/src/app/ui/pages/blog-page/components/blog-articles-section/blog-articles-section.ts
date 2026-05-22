@@ -2,27 +2,30 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+
 import { BlogArticle } from '../../../../models/blog-article.interface';
+import { HasRoleDirective } from '../../../../../shared/directives/has-role.directive';
 
 @Component({
   selector: 'app-blog-articles-section',
   standalone: true,
-  imports: [RouterModule, MatIconModule, MatCardModule],
+  imports: [
+    RouterModule,
+    MatIconModule,
+    MatCardModule,
+    HasRoleDirective,
+  ],
   templateUrl: './blog-articles-section.html',
   styleUrl: './blog-articles-section.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogArticlesSection {
-  // loading state
   @Input({ required: true }) isLoading = false;
 
-  // current page articles
   @Input({ required: true }) articles: BlogArticle[] = [];
 
-  // current page number
   @Input({ required: true }) currentPage = 1;
 
-  // total available pages
   @Input({ required: true }) totalPages = 1;
 
   @Output() deleteArticle = new EventEmitter<string>();

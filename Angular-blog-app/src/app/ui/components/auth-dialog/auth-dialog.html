@@ -1,0 +1,72 @@
+<section class="auth-dialog">
+    <button type="button" class="auth-dialog__close" mat-icon-button aria-label="Close auth dialog"
+        (click)="closeDialog()">
+        <mat-icon>close</mat-icon>
+    </button>
+
+    <h2 mat-dialog-title class="auth-dialog__title">
+        {{ isRegisterMode() ? 'Регистрация' : 'Войти' }}
+    </h2>
+
+    <mat-dialog-content class="auth-dialog__content">
+        @if (requestError()) {
+        <p class="auth-dialog__error">
+            {{ requestError() }}
+        </p>
+        }
+
+        <form class="auth-dialog__form" [formGroup]="form" (ngSubmit)="submitForm()">
+            <mat-form-field appearance="outline">
+                <mat-label>
+                    {{ isRegisterMode() ? 'Логин' : 'Логин или email' }}
+                </mat-label>
+
+                <input matInput type="text" formControlName="login" />
+
+                @if (form.controls.login.invalid && form.controls.login.touched) {
+                <mat-error>Логин обязателен</mat-error>
+                }
+            </mat-form-field>
+
+            @if (isRegisterMode()) {
+            <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+
+                <input matInput type="email" formControlName="email" />
+
+                @if (form.controls.email.invalid && form.controls.email.touched) {
+                <mat-error>Введите корректный email</mat-error>
+                }
+            </mat-form-field>
+            }
+
+            <mat-form-field appearance="outline">
+                <mat-label>Пароль</mat-label>
+
+                <input matInput type="password" formControlName="password" />
+
+                @if (form.controls.password.invalid && form.controls.password.touched) {
+                <mat-error>Минимум 6 символов</mat-error>
+                }
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" class="auth-dialog__submit"
+                [disabled]="form.invalid || isSubmitting()">
+                <mat-icon>{{ isRegisterMode() ? 'person_add' : 'login' }}</mat-icon>
+                {{ isRegisterMode() ? 'Зарегистрироваться' : 'Войти' }}
+            </button>
+        </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="auth-dialog__actions" align="center">
+        @if (isRegisterMode()) {
+        <button type="button" mat-button (click)="switchToLogin()">
+            Уже есть аккаунт? Войти
+        </button>
+        } @else {
+        <button type="button" mat-button (click)="switchToRegister()">
+            Регистрация
+        </button>
+        }
+    </mat-dialog-actions>
+</section>
