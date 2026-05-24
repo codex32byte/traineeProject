@@ -131,26 +131,27 @@
                             </span>
 
                             <div class="article-comment-card__rating-stars"
-                                [attr.aria-label]="'Comment rating ' + formatCommentRating(comment.rating) + ' out of 5'"
+                                [attr.aria-label]="'Comment rating ' + (comment.rating | commentRating) + ' out of 5'"
                                 (mouseleave)="clearCommentRatingPreview(comment.id)"
                                 (focusout)="clearCommentRatingPreviewOnFocusOut(comment.id, $event)">
                                 @for (star of commentRatingStars; track star) {
                                 <button type="button" class="article-comment-card__rating-button"
-                                    [class.article-comment-card__rating-button_active]="isCommentStarActive(comment.id, comment.rating, star)"
+                                    [class.article-comment-card__rating-button_active]="comment.rating | commentStarActive: star : comment.id : commentRatingPreview()"
                                     [disabled]="isCommentRatingUpdating(comment.id)"
                                     [attr.aria-label]="'Rate comment ' + star + ' stars'"
                                     (mouseenter)="setCommentRatingPreview(comment.id, star)"
                                     (focus)="setCommentRatingPreview(comment.id, star)"
                                     (click)="updateCommentRating(comment.id, star)">
                                     <mat-icon>
-                                        {{ getCommentStarIcon(comment.id, comment.rating, star) }}
+                                        {{ comment.rating | commentStarIcon: star : comment.id : commentRatingPreview()
+                                        }}
                                     </mat-icon>
                                 </button>
                                 }
                             </div>
 
                             <span class="article-comment-card__rating-value">
-                                {{ formatCommentRating(comment.rating) }} / 5
+                                {{ comment.rating | commentRating }} / 5
                             </span>
                         </div>
                     </mat-card-actions>
