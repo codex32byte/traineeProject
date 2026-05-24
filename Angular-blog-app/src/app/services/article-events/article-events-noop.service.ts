@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 
+import { ArticleEventsServiceInterface } from './article-events-service.interface';
 import {
-    ArticleEventsServiceInterface,
     ArticleRatingChangedEvent,
     CommentCreatedEvent,
     CommentRatingChangedEvent,
-} from './article-events-service.interface';
+} from './article-events.models';
 
 @Injectable()
 export class ArticleEventsNoopService implements ArticleEventsServiceInterface {

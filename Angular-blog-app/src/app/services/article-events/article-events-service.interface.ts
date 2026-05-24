@@ -1,34 +1,10 @@
 import { Observable } from 'rxjs';
 
-export interface CommentCreatedEvent {
-    type: 'COMMENT_CREATED';
-    payload: {
-        commentId: string;
-        articleId: string;
-        content: string;
-        username: string;
-        createdAt: Date;
-    };
-}
-
-export interface CommentRatingChangedEvent {
-    type: 'COMMENT_RATING_CHANGED';
-    payload: {
-        commentId: string;
-        articleId: string;
-        rating: number;
-        prevRating: number;
-    };
-}
-
-export interface ArticleRatingChangedEvent {
-    type: 'ARTICLE_RATING_CHANGED';
-    payload: {
-        articleId: string;
-        rating: number;
-        prevRating: number;
-    };
-}
+import {
+    ArticleRatingChangedEvent,
+    CommentCreatedEvent,
+    CommentRatingChangedEvent,
+} from './article-events.models';
 
 export interface ArticleEventsServiceInterface {
     readonly commentCreated$: Observable<CommentCreatedEvent>;

@@ -18,7 +18,8 @@ import {
     ArticleRatingChangedEvent,
     CommentCreatedEvent,
     CommentRatingChangedEvent,
-} from '../../../services/article-events/article-events-service.interface';
+    CommentRatingPreview,
+} from '../../../services/article-events/article-events.models';
 
 import {
     ArticleComment,
@@ -28,6 +29,9 @@ import {
 } from '../../models/blog-article.interface';
 
 import { ArticleCommentForm } from './components/article-comment-form/article-comment-form';
+import { CommentRatingPipe } from '../../pipes/comment-rating.pipe';
+import { CommentStarActivePipe } from '../../pipes/comment-star-active.pipe';
+import { CommentStarIconPipe } from '../../pipes/comment-star-icon.pipe';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -40,6 +44,9 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
     imports: [
         RouterModule,
         ArticleCommentForm,
+        CommentRatingPipe,
+        CommentStarActivePipe,
+        CommentStarIconPipe,
         MatCardModule,
         MatButtonModule,
         MatIconModule,
@@ -65,10 +72,8 @@ export class ArticleDetailsPage {
     protected readonly updatingCommentRatingId = signal<string | null>(null);
     protected readonly commentRatingStars = [1, 2, 3, 4, 5];
 
-    protected readonly commentRatingPreview = signal<{
-        commentId: string;
-        rating: number;
-    } | null>(null);
+    protected readonly commentRatingPreview =
+        signal<CommentRatingPreview | null>(null);
 
     protected readonly commentsPageSize = signal(5);
     protected readonly commentsPageIndex = signal(0);
@@ -171,32 +176,6 @@ export class ArticleDetailsPage {
         return this.updatingCommentRatingId() === commentId;
     }
 
-    protected getCommentStarIcon(
-        commentId: string,
-        commentRating: number,
-        star: number
-    ): string {
-        const rating = this.getDisplayedCommentRating(commentId, commentRating);
-
-        if (rating >= star) {
-            return 'star';
-        }
-
-        if (rating >= star - 0.5) {
-            return 'star_half';
-        }
-
-        return 'star_border';
-    }
-
-    protected isCommentStarActive(
-        commentId: string,
-        commentRating: number,
-        star: number
-    ): boolean {
-        return this.getDisplayedCommentRating(commentId, commentRating) >= star - 0.5;
-    }
-
     protected setCommentRatingPreview(commentId: string, rating: number): void {
         if (this.updatingCommentRatingId()) {
             return;
@@ -230,20 +209,6 @@ export class ArticleDetailsPage {
         }
 
         this.clearCommentRatingPreview(commentId);
-    }
-
-    protected formatCommentRating(rating: number): string {
-        return this.normalizeRatingValue(rating).toFixed(2);
-    }
-
-    private getDisplayedCommentRating(commentId: string, commentRating: number): number {
-        const preview = this.commentRatingPreview();
-
-        if (preview?.commentId === commentId) {
-            return preview.rating;
-        }
-
-        return this.normalizeRatingValue(commentRating);
     }
 
     private voteArticle(vote: ArticleVote): void {
@@ -461,10 +426,6 @@ export class ArticleDetailsPage {
             response.comments,
             response.articleRating
         );
-    }
-
-    private normalizeRatingValue(rating: number): number {
-        return Math.min(Math.max(Number(rating ?? 0), 0), 5);
     }
 
     private formatDate(date: Date): string {

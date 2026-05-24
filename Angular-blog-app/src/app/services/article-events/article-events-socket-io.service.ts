@@ -3,12 +3,12 @@ import { Observable, Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 
 import { environment } from '../../../environments/environment';
+import { ArticleEventsServiceInterface } from './article-events-service.interface';
 import {
-    ArticleEventsServiceInterface,
     ArticleRatingChangedEvent,
     CommentCreatedEvent,
     CommentRatingChangedEvent,
-} from './article-events-service.interface';
+} from './article-events.models';
 
 @Injectable()
 export class ArticleEventsSocketIoService implements ArticleEventsServiceInterface {
